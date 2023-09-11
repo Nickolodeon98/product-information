@@ -9,6 +9,6 @@ public class ParserFactory {
 
   @Bean
   public ReadLineContext<Product> productReadLineContext() {
-
+    return new ReadLineContext<Product>(new ProductParser());
   }
 }
