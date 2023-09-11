@@ -18,9 +18,9 @@ public class ProductService {
   private final ProductRepository productRepository;
 
 
-  public ProductResponse createProduct(String filename) throws IOException {
+  public ProductResponse createProduct(ProductRequest productRequest) throws IOException {
 
-    List<Product> products = productRepository.saveAll(productReadLineContext.readLines(filename));
+    List<Product> products = productRepository.saveAll(productReadLineContext.readLines(productRequest.getFilename()));
 
     return ProductResponse.of(products, "상품 등록 완료");
   }
