@@ -1,7 +1,8 @@
 package com.example.productinformation.controller;
 
-import com.example.productinformation.domain.dto.ProductRequest;
-import com.example.productinformation.domain.dto.ProductResponse;
+import com.example.productinformation.domain.dto.request.ProductRequest;
+import com.example.productinformation.domain.dto.response.ProductResponse;
+import com.example.productinformation.domain.Response;
 import com.example.productinformation.service.ProductService;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.example.productinformation.parser;
 
-import com.example.productinformation.domain.Product;
+import com.example.productinformation.domain.entity.Product;
 
 public class ProductParser implements Parser<Product> {
 

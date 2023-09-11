@@ -1,4 +1,4 @@
-package com.example.productinformation.domain.dto;
+package com.example.productinformation.domain.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

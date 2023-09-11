@@ -1,14 +1,12 @@
 package com.example.productinformation.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.productinformation.domain.Product;
-import com.example.productinformation.domain.dto.ProductRequest;
-import com.example.productinformation.domain.dto.ProductResponse;
-import com.example.productinformation.parser.ProductParser;
+import com.example.productinformation.domain.entity.Product;
+import com.example.productinformation.domain.dto.request.ProductRequest;
+import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.parser.ReadLineContext;
 import com.example.productinformation.repository.ProductRepository;
 import java.io.IOException;

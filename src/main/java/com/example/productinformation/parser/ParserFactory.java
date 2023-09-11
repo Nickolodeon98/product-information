@@ -1,6 +1,6 @@
 package com.example.productinformation.parser;
 
-import com.example.productinformation.domain.Product;
+import com.example.productinformation.domain.entity.Product;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -1,4 +1,4 @@
-package com.example.productinformation.domain;
+package com.example.productinformation.domain.entity;
 
 
 import javax.persistence.Entity;

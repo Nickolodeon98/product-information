@@ -1,8 +1,8 @@
 package com.example.productinformation.service;
 
-import com.example.productinformation.domain.Product;
-import com.example.productinformation.domain.dto.ProductRequest;
-import com.example.productinformation.domain.dto.ProductResponse;
+import com.example.productinformation.domain.entity.Product;
+import com.example.productinformation.domain.dto.request.ProductRequest;
+import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.parser.ReadLineContext;
 import com.example.productinformation.repository.ProductRepository;
 import java.io.IOException;

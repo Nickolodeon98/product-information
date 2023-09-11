@@ -1,6 +1,6 @@
-package com.example.productinformation.domain.dto;
+package com.example.productinformation.domain.dto.response;
 
-import com.example.productinformation.domain.Product;
+import com.example.productinformation.domain.entity.Product;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
