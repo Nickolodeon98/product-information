@@ -1,7 +1,9 @@
 package com.example.productinformation.controller;
 
+import com.example.productinformation.domain.dto.ProductRequest;
 import com.example.productinformation.domain.dto.ProductResponse;
 import com.example.productinformation.service.ProductService;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -20,7 +22,8 @@ public class ProductController {
 
   @ResponseBody
   @PostMapping("/new")
-  public Response<ProductResponse> registerItems(@RequestBody ProductRequest productRequest) {
+  public Response<ProductResponse> registerItems(@RequestBody ProductRequest productRequest)
+      throws IOException {
     ProductResponse productResponse = productService.createProduct(productRequest);
 
     return Response.success(productResponse);

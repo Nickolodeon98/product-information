@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.productinformation.domain.Product;
+import com.example.productinformation.domain.dto.ProductRequest;
 import com.example.productinformation.domain.dto.ProductResponse;
 import com.example.productinformation.parser.ProductParser;
 import com.example.productinformation.parser.ReadLineContext;
@@ -44,7 +45,7 @@ class ProductServiceTest {
   String sampleLine3;
   Product mockProduct;
   List<Product> products;
-
+  ProductRequest productRequest;
   @BeforeEach
   void setUp() {
     sampleLine1 = "\"300002285\",\"아비루즈 ha-15\",\"//image.wconcept.co.kr/productimg/image/img2/85/300002285.jpg\",\"m.wconcept.co.kr/product/300002285\",\"5900\",\"5900\"";
@@ -57,6 +58,7 @@ class ProductServiceTest {
 
     products = new ArrayList<>();
     products.add(mockProduct);
+    productRequest = ProductRequest.builder().filename("filename").build();
   }
 
   @Nested
@@ -69,7 +71,7 @@ class ProductServiceTest {
       when(productReadLineContext.readLines("filename")).thenReturn(products);
       when(productRepository.saveAll(any())).thenReturn(products);
 
-      ProductResponse response = productService.createProduct("filename");
+      ProductResponse response = productService.createProduct(productRequest);
 
       Assertions.assertEquals(List.of(products.get(0).getId()), response.getProductIds().get(0));
 
