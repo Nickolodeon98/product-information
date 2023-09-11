@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.productinformation.domain.Product;
+import com.example.productinformation.domain.dto.ProductResponse;
 import com.example.productinformation.parser.ProductParser;
 import com.example.productinformation.parser.ReadLineContext;
 import com.example.productinformation.repository.ProductRepository;
@@ -33,9 +34,6 @@ class ProductServiceTest {
   ReadLineContext<Product> productReadLineContext;
 
   @Mock
-  ProductParser productParser;
-
-  @Mock
   ProductRepository productRepository;
 
   @InjectMocks
@@ -53,14 +51,9 @@ class ProductServiceTest {
     sampleLine2 = "\"300002301\",\"아비루즈 bt-16\",\"//image.wconcept.co.kr/productimg/image/img2/01/300002301.jpg\",\"m.wconcept.co.kr/product/300002301\",\"5900\",\"5900\"";
     sampleLine3 = "\"300003606\",\"CANVAS TOTE BAG-BROWN\",\"//image.wconcept.co.kr/productimg/image/img2/06/300003606.jpg\",\"m.wconcept.co.kr/product/300003606\",\"98000\",\"98000\"";
 
-    mockProduct = Product.builder()
-        .itemId(300002285L)
-        .itemName("아비루즈 ha-15")
+    mockProduct = Product.builder().itemId(300002285L).itemName("아비루즈 ha-15")
         .itemImage("//image.wconcept.co.kr/productimg/image/img2/85/300002285.jpg")
-        .itemUrl("m.wconcept.co.kr/product/300002285")
-        .originalPrice(5900)
-        .salePrice(5900)
-        .build();
+        .itemUrl("m.wconcept.co.kr/product/300002285").originalPrice(5900).salePrice(5900).build();
 
     products = new ArrayList<>();
     products.add(mockProduct);
@@ -78,26 +71,26 @@ class ProductServiceTest {
 
       ProductResponse response = productService.createProduct("filename");
 
-      Assertions.assertEquals(List.of(products.get(0).getId()), response.getIds());
+      Assertions.assertEquals(List.of(products.get(0).getId()), response.getProductIds().get(0));
 
       verify(productRepository).save(any());
     }
   }
 
-  @Nested
-  @DisplayName("아이템 조회")
-  class ProductAcquisition {
-
-    @Test
-    @DisplayName("성공")
-    void success_read_product() {
-      when(productRepository.findById())
-    }
-
-    @Test
-    @DisplayName("실패")
-    void fail_read_product() {
-
-    }
-  }
+//  @Nested
+//  @DisplayName("아이템 조회")
+//  class ProductAcquisition {
+//
+//    @Test
+//    @DisplayName("성공")
+//    void success_read_product() {
+//      when(productRepository.findById())
+//    }
+//
+//    @Test
+//    @DisplayName("실패")
+//    void fail_read_product() {
+//
+//    }
+//  }
 }
