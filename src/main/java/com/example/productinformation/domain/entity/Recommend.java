@@ -1,9 +1,11 @@
 package com.example.productinformation.domain.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,12 +22,13 @@ import lombok.Setter;
 public class Recommend {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private Long itemId;
 
   @ManyToOne
-  private Product product;
+  @JoinColumn(referencedColumnName = "itemId")
+  private Product targetItem;
 
   private Integer score;
   private Integer rank;
