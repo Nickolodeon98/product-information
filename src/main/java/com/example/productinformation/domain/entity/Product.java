@@ -27,6 +27,6 @@ public class Product {
   private String itemImage;
   private String itemUrl;
   // 상품의 가격이 22억을 넘는 경우는 없으므로 int 로 설정한다.
-  private int originalPrice;
-  private int salePrice;
+  private Integer originalPrice;
+  private Integer salePrice;
 }
