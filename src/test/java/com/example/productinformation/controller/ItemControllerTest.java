@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.productinformation.domain.dto.request.FileRequest;
+import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Recommend;
 import com.example.productinformation.service.ItemService;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
-1import com.example.productinformation.domain.dto.request.FileRequest;
+import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.entity.Recommend;
 import com.example.productinformation.parser.ReadLineContext;
