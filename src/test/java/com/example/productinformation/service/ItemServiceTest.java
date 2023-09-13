@@ -1,6 +1,7 @@
 package com.example.productinformation.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -82,7 +83,6 @@ class ItemServiceTest {
   @Nested
   @DisplayName("상품 등록")
   class ProductCreation {
-
     @Test
     @DisplayName("성공")
     void success_create_product() throws IOException {
@@ -131,7 +131,7 @@ class ItemServiceTest {
 
       Assertions.assertEquals(id, secondId);
 
-      verify(productRepository).findByItemId(any());
+      verify(productRepository,times(2)).findByItemId(any());
       verify(recommendRepository).findAllByTarget(mockProduct);
     }
 
@@ -140,10 +140,12 @@ class ItemServiceTest {
     void success_search_several_item() {
       when(productRepository.findAllByItemIdIn(any())).thenReturn(Optional.of(products));
       when(recommendRepository.findAllByTargetIn(products)).thenReturn(recommends);
+      when(productRepository.findByItemId(any())).thenReturn(Optional.of(mockProduct));
 
       Assertions.assertEquals(recommends.get(0).getItemId(),
-          itemService.acquireItem("300002285,300005968").getResults().get(0).getItemId());
+          itemService.acquireItem("300373871,300373871").getResults().get(0).getItemId());
 
+      verify(productRepository).findByItemId(any());
       verify(productRepository).findAllByItemIdIn(any());
       verify(recommendRepository).findAllByTargetIn(products);
     }

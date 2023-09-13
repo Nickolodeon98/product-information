@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.productinformation.domain.dto.DetailedInfo;
+import com.example.productinformation.domain.dto.TargetInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
@@ -105,7 +106,7 @@ class ItemControllerTest {
     @DisplayName("성공 - 단건")
     void item_search_success() throws Exception {
 
-      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(products, detailedInfos));
+      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(TargetInfo.of(products), detailedInfos));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", String.valueOf(itemId)))
@@ -128,7 +129,7 @@ class ItemControllerTest {
       products.add(product2);
       products.add(product3);
 
-      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(products, detailedInfos));
+      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(TargetInfo.of(products), detailedInfos));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", severalIds))
