@@ -26,7 +26,7 @@ public class DetailedInfo {
 
   public static DetailedInfo of(Product productInfo, Recommend recommend) {
     return DetailedInfo.builder()
-        .itemId(productInfo.getItemId())
+        .itemId(recommend.getItemId())
         .itemName(productInfo.getItemName() == null ? null : productInfo.getItemName())
         .itemImage(productInfo.getItemImage() == null ? null : productInfo.getItemImage())
         .itemUrl(productInfo.getItemUrl() == null ? null : productInfo.getItemUrl())
