@@ -1,5 +1,6 @@
 package com.example.productinformation.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -13,9 +14,12 @@ import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
+import com.example.productinformation.exception.ErrorCode;
+import com.example.productinformation.exception.ItemException;
 import com.example.productinformation.fixture.ProductFixture;
 import com.example.productinformation.fixture.RecommendFixture;
 import com.example.productinformation.service.ItemService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,13 +105,13 @@ class ItemControllerTest {
 
   @Nested
   @DisplayName("상품 등록")
-  class RecommendRegistration {
+  class ProductRegistration {
 
     @Test
     @DisplayName("성공")
-    void recommend_success() throws Exception {
+    void success_register_product() throws Exception {
       // given
-      given(itemService.extraProduct(productRequest))
+      given(itemService.extraProduct(any()))
           .willReturn(ProductInfo.of(mockItem));
 
       mockMvc.perform(post(extraUrl).contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +121,24 @@ class ItemControllerTest {
           .andExpect(jsonPath("$.result.itemId").value(itemId))
           .andDo(print());
 
-      verify(itemService).extraProduct(productRequest);
+      verify(itemService).extraProduct(any());
+    }
+
+    @Test
+    @DisplayName("실패")
+    void fail_register_product() throws Exception {
+      given(itemService.extraProduct(any()))
+          .willThrow(new ItemException(ErrorCode.INVALID_INPUT, ErrorCode.INVALID_INPUT.getMessage()));
+
+      mockMvc.perform(post(extraUrl).contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsBytes(any())))
+          .andExpect(status().isNotAcceptable())
+          .andExpect(jsonPath("$.resultCode").value("ERROR"))
+          .andExpect(jsonPath("$.result.errorCode").value(ErrorCode.INVALID_INPUT.name()))
+          .andExpect(jsonPath("$.result.message").value(ErrorCode.INVALID_INPUT.getMessage()))
+          .andDo(print());
+
+      verify(itemService).extraProduct(any());
     }
   }
 
