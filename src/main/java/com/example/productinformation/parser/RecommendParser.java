@@ -25,11 +25,18 @@ public class RecommendParser implements Parser<Recommend> {
     row[FIRST] = row[FIRST].replaceAll("\"", "");
     row[END] = row[END].replaceAll("\"", "");
 
-    Product product = productRepository.findByItemId(Long.valueOf(row[FIRST]))
-        .orElseThrow(() -> new IllegalArgumentException());
+    Optional<Product> product = productRepository.findByItemId(Long.valueOf(row[FIRST]));
+    Product relatedProduct = null;
+
+    if (product.isEmpty()) {
+      relatedProduct = Product.builder()
+          .itemId(Long.valueOf(row[FIRST]))
+          .build();
+      productRepository.save(relatedProduct);
+    } else relatedProduct = product.get();
 
     return Recommend.builder()
-        .target(product)
+        .target(relatedProduct)
         .itemId(Long.valueOf(row[1]))
         .score(Integer.valueOf(row[2]))
         .ranking(Integer.valueOf(row[END]))
