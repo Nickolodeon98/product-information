@@ -6,6 +6,8 @@ import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.entity.Recommend;
+import com.example.productinformation.exception.ErrorCode;
+import com.example.productinformation.exception.ItemException;
 import com.example.productinformation.parser.ReadLineContext;
 import com.example.productinformation.repository.ProductRepository;
 import com.example.productinformation.repository.RecommendRepository;
@@ -29,35 +31,46 @@ public class ItemService {
 
   public ProductResponse createProduct(FileRequest fileRequest) throws IOException {
 
-    List<Product> products = productRepository.saveAll(productReadLineContext.readLines(fileRequest.getFilename()));
+    List<Product> products = productRepository.saveAll(
+        productReadLineContext.readLines(fileRequest.getFilename()));
 
     return ProductResponse.of(products, "등록 완료");
   }
 
   public RecommendResponse createRecommend(FileRequest fileRequest) throws IOException {
 
-    List<Recommend> recommends = recommendRepository.saveAll(recommendReadLineContext.readLines(fileRequest.getFilename()));
+    List<Recommend> recommends = recommendRepository.saveAll(
+        recommendReadLineContext.readLines(fileRequest.getFilename()));
 
     return RecommendResponse.of(recommends, "등록 완료");
   }
 
   public ItemResponse acquireItem(String itemId) {
-    List<Product> products = new ArrayList<>();
     List<Recommend> recommends = new ArrayList<>();
 
     if (itemId.contains(",")) {
       String[] ids = itemId.split(",");
-      for (String id : ids) {
-        Product product = productRepository.findByItemId(Long.valueOf(id)).get();
-        products.add(product);
-        recommends = recommendRepository.findAllByTarget(product);
-      }
+
+      List<Product> products = productRepository.findAllByItemIdIn(ids)
+          .orElseThrow(()->{
+            throw new ItemException(ErrorCode.ITEM_NOT_FOUND,
+                ErrorCode.ITEM_NOT_FOUND.getMessage());
+          });
+
+      recommends = recommendRepository.findAllByTargetIn(products);
+
       return ItemResponse.of(products, recommends);
     }
 
-    Product product = productRepository.findByItemId(Long.valueOf(itemId)).get();
+    Product product = productRepository.findByItemId(Long.valueOf(itemId))
+        .orElseThrow(()->{
+          throw new ItemException(ErrorCode.ITEM_NOT_FOUND,
+              ErrorCode.ITEM_NOT_FOUND.getMessage());
+        });
 
+    List<Product> products = new ArrayList<>();
     products.add(product);
+
     recommends = recommendRepository.findAllByTarget(product);
 
     return ItemResponse.of(products, recommends);
