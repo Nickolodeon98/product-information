@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.dto.request.FileRequest;
@@ -98,11 +99,11 @@ class ItemServiceTest {
 
   @Nested
   @DisplayName("연관 상품 등록")
-  class ProductAcquisition {
+  class ProductRegistration {
 
     @Test
     @DisplayName("성공")
-    void success_read_product() throws IOException {
+    void success_add_product() throws IOException {
       when(recommendReadLineContext.readLines("filename")).thenReturn(recommends);
       when(recommendRepository.saveAll(any())).thenReturn(recommends);
 
@@ -115,8 +116,27 @@ class ItemServiceTest {
 
     @Test
     @DisplayName("실패")
-    void fail_read_product() {
+    void fail_add_product() {
 
+    }
+  }
+
+  @Nested
+  @DisplayName("상품 조회")
+  class ItemSearch {
+
+    @Test
+    @DisplayName("성공")
+    void success_search_item() {
+      when(productRepository.findByItemId(any())).thenReturn(mockProduct);
+      when(recommendRepository.findAllByTargetItem(mockProduct)).thenReturn(recommends);
+
+      ItemResponse itemResponse = itemService.acquireItem(String.valueOf(itemId));
+
+      Assertions.assertEquals(recommends.get(0), itemResponse.getRecommends().get(0));
+
+      verify(productRepository).findByItemId(any());
+      verify(recommendRepository).findByTargetItemId(any());
     }
   }
 }
