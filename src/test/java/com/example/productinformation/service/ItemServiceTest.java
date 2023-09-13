@@ -140,6 +140,24 @@ class ItemServiceTest {
     }
   }
 
+//  @Nested
+//  @DisplayName("연관 상품 등록")
+//  class ProductRegistration {
+//
+//    @Test
+//    @DisplayName("성공")
+//    void success_add_product() throws IOException {
+//      when(recommendReadLineContext.readLines("filename")).thenReturn(recommends);
+//      when(recommendRepository.saveAll(any())).thenReturn(recommends);
+//
+//      RecommendResponse response = itemService.createRecommend(fileRequest);
+//
+//      Assertions.assertEquals(recommends.get(0).getId(), response.getRecommendIds().get(0));
+//
+//      verify(recommendRepository).saveAll(any());
+//    }
+//  }
+
   @Nested
   @DisplayName("연관 상품 등록")
   class ProductRegistration {
