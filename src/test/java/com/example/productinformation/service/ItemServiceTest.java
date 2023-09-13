@@ -9,6 +9,8 @@ import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.entity.Recommend;
+import com.example.productinformation.exception.ErrorCode;
+import com.example.productinformation.exception.ItemException;
 import com.example.productinformation.fixture.ProductFixture;
 import com.example.productinformation.fixture.RecommendFixture;
 import com.example.productinformation.parser.ReadLineContext;
@@ -118,13 +120,14 @@ class ItemServiceTest {
   class ItemSearch {
 
     @Test
-    @DisplayName("성공")
+    @DisplayName("성공 - 단건")
     void success_search_item() {
       when(productRepository.findByItemId(any())).thenReturn(Optional.of(mockProduct));
       when(recommendRepository.findAllByTarget(mockProduct)).thenReturn(recommends);
 
       Long id = recommends.get(0).getItemId();
-      Long secondId = itemService.acquireItem(String.valueOf(itemId)).getResults().get(0).getItemId();
+      Long secondId = itemService.acquireItem(String.valueOf(itemId)).getResults().get(0)
+          .getItemId();
 
       Assertions.assertEquals(id, secondId);
 
@@ -133,9 +136,42 @@ class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("실패")
-    void fail_search_item() {
+    @DisplayName("성공 - 2건 이상")
+    void success_search_several_item() {
+      when(productRepository.findAllByItemIdIn(any())).thenReturn(Optional.of(products));
+      when(recommendRepository.findAllByTargetIn(products)).thenReturn(recommends);
 
+      Assertions.assertEquals(recommends.get(0).getItemId(),
+          itemService.acquireItem("300002285,300005968").getResults().get(0).getItemId());
+
+      verify(productRepository).findAllByItemIdIn(any());
+      verify(recommendRepository).findAllByTargetIn(products);
+    }
+
+    @Test
+    @DisplayName("실패 - 단건")
+    void fail_search_item() {
+      when(productRepository.findByItemId(any())).thenReturn(Optional.empty());
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.acquireItem(String.valueOf(itemId)));
+
+      Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+
+      verify(productRepository).findByItemId(any());
+    }
+
+    @Test
+    @DisplayName("실패 - 2건 이상")
+    void fail_search_several_item() {
+      when(productRepository.findAllByItemIdIn(any())).thenReturn(Optional.empty());
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.acquireItem("300002285,300005968"));
+
+      Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+
+      verify(productRepository).findAllByItemIdIn(any());
     }
   }
 }
