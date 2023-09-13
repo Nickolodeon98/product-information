@@ -1,6 +1,7 @@
 package com.example.productinformation.service;
 
 import com.example.productinformation.domain.dto.DetailedInfo;
+import com.example.productinformation.domain.dto.TargetInfo;
 import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
@@ -78,7 +79,7 @@ public class ItemService {
 
       recommends = recommendRepository.findAllByTargetIn(products);
 
-      return ItemResponse.of(products, combineInfo(recommends));
+      return ItemResponse.of(TargetInfo.of(products), combineInfo(recommends));
     }
 
     Product product = productRepository.findByItemId(Long.valueOf(itemId))
@@ -92,7 +93,7 @@ public class ItemService {
 
     recommends = recommendRepository.findAllByTarget(product);
 
-    return ItemResponse.of(products, combineInfo(recommends));
+    return ItemResponse.of(TargetInfo.of(products), combineInfo(recommends));
   }
 
   /**
@@ -104,7 +105,11 @@ public class ItemService {
     List<DetailedInfo> detailedInfos = new ArrayList<>();
 
     for (Recommend recommend : recommends) {
-      Product productInfo = productRepository.findByItemId(recommend.getItemId()).get();
+      Product productInfo = productRepository.findByItemId(recommend.getItemId())
+          .orElseThrow(() -> {
+            throw new ItemException(ErrorCode.ITEM_NOT_FOUND,
+                ErrorCode.ITEM_NOT_FOUND.getMessage());
+          });
 
       detailedInfos.add(DetailedInfo.of(productInfo, recommend));
     }
