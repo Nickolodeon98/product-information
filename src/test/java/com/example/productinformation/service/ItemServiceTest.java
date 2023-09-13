@@ -106,12 +106,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("성공")
     void success_create_product() throws IOException {
+      when(productRepository.findByItemId(itemId)).thenReturn(Optional.empty());
       when(productRepository.save(any())).thenReturn(mockProduct);
 
       ProductInfo response = itemService.extraProduct(mockProduct.toRequest());
 
       Assertions.assertEquals(mockProduct.getItemId(), response.getItemId());
 
+      verify(productRepository).findByItemId(itemId);
       verify(productRepository).save(any());
     }
 

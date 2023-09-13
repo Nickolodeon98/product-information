@@ -16,6 +16,7 @@ import com.example.productinformation.repository.RecommendRepository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,7 @@ public class ItemService {
 
   /**
    * 파라미터로 주어진 상품 아이디에 따라 상품 정보와 연관 상품 정보를 찾아 반환한다.
+   *
    * @param itemId
    * @return ItemResponse
    */
@@ -60,7 +62,7 @@ public class ItemService {
     // 입력에 공백이 들어갈 경우를 감안해서 공백을 먼저 제거해준다.
     itemId = itemId.trim();
 
-    if (itemId.charAt(itemId.length()-1) == ',' || itemId.charAt(0) == ',') {
+    if (itemId.charAt(itemId.length() - 1) == ',' || itemId.charAt(0) == ',') {
       throw new ItemException(ErrorCode.INVALID_INPUT,
           ErrorCode.INVALID_INPUT.getMessage());
     }
@@ -72,7 +74,7 @@ public class ItemService {
         idNums[i] = Long.valueOf(ids[i]);
       }
       List<Product> products = productRepository.findAllByItemIdIn(idNums)
-          .orElseThrow(()->{
+          .orElseThrow(() -> {
             throw new ItemException(ErrorCode.ITEM_NOT_FOUND,
                 ErrorCode.ITEM_NOT_FOUND.getMessage());
           });
@@ -83,7 +85,7 @@ public class ItemService {
     }
 
     Product product = productRepository.findByItemId(Long.valueOf(itemId))
-        .orElseThrow(()->{
+        .orElseThrow(() -> {
           throw new ItemException(ErrorCode.ITEM_NOT_FOUND,
               ErrorCode.ITEM_NOT_FOUND.getMessage());
         });
@@ -98,6 +100,7 @@ public class ItemService {
 
   /**
    * 연관 상품 목록을 받으면 상품의 상세 정보를 연관도 정보와 함께 병합한다.
+   *
    * @param recommends
    * @return List
    */
@@ -119,6 +122,7 @@ public class ItemService {
 
   /**
    * 입력으로 주어진 상품 정보를 DB에 저장한다.
+   *
    * @param productRequest
    * @return
    */
@@ -126,6 +130,12 @@ public class ItemService {
     if (productRequest.getItemId() == null) {
       throw new ItemException(ErrorCode.INVALID_INPUT,
           ErrorCode.INVALID_INPUT.getMessage());
+    }
+
+    Optional<Product> product = productRepository.findByItemId(productRequest.getItemId());
+    if (product.isPresent()) {
+      throw new ItemException(ErrorCode.DUPLICATE_ITEM,
+          ErrorCode.DUPLICATE_ITEM.getMessage());
     }
 
     Product savedProduct = productRepository.save(productRequest.toEntity());
