@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.text.html.Option;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,6 +62,7 @@ class ItemServiceTest {
   FileRequest fileRequest;
   Long itemId;
   Product wrongProduct;
+  Recommend wrongRecommend;
 
   @BeforeEach
   void setUp() {
@@ -81,6 +83,7 @@ class ItemServiceTest {
     fileRequest = FileRequest.builder().filename("filename").build();
 
     wrongProduct = ProductFixture.getWrong();
+    wrongRecommend = RecommendFixture.getWrong(itemId);
   }
 
   //  @Nested
@@ -118,7 +121,7 @@ class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("실패 - 고유 아이디가 주어지지 않음")
+    @DisplayName("실패 - 상품의 고유 아이디가 주어지지 않음")
     void fail_create_product_no_id() {
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.extraProduct(wrongProduct.toRequest()));
@@ -127,7 +130,7 @@ class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("실패 - 이미 존재하는 고유 아이디")
+    @DisplayName("실패 - 이미 존재하는 상품의 고유 아이디")
     void fail_create_product_duplicate_id() {
       when(productRepository.findByItemId(itemId)).thenReturn(Optional.of(mockProduct));
 
@@ -160,20 +163,56 @@ class ItemServiceTest {
 
   @Nested
   @DisplayName("연관 상품 등록")
-  class ProductRegistration {
+  class RecommendRegistration {
 
     @Test
     @DisplayName("성공")
-    void success_add_product() throws IOException {
-      when(recommendReadLineContext.readLines("filename")).thenReturn(recommends);
-      when(recommendRepository.saveAll(any())).thenReturn(recommends);
+    void success_add_recommend() throws IOException {
+      when(productRepository.findByItemId(itemId)).thenReturn(Optional.of(mockProduct));
+      when(recommendRepository.save(any())).thenReturn(mockRecommend);
 
-      RecommendResponse response = itemService.createRecommend(fileRequest);
+      SingleRecommendResponse response = itemService.relateItems(mockRecommend.toRequest(), itemId);
 
-      Assertions.assertEquals(recommends.get(0).getId(), response.getRecommendIds().get(0));
+      Assertions.assertEquals(mockRecommend.getItemId(), response.getItemId());
+      Assertions.assertEquals(mockRecommend.getTarget().getItemId(), response.getTargetItemId());
 
-      verify(recommendRepository).saveAll(any());
+      verify(productRepository).findByItemId(itemId);
+      verify(recommendRepository).save(any());
     }
+    @Test
+    @DisplayName("실패 - 이미 존재하는 연관 상품")
+    void fail_create_product_duplicate_id() {
+      when(recommendRepository.findByItemId(itemId)).thenReturn(Optional.of(mockRecommend));
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.relateItems(mockRecommend.toRequest(), itemId));
+
+      Assertions.assertEquals(ErrorCode.DUPLICATE_ITEM, e.getErrorCode());
+
+      verify(recommendRepository).findByItemId(itemId);
+    }
+    @Test
+    @DisplayName("실패 - 연관 상품의 고유 아이디가 주어지지 않음")
+    void fail_add_recommend_id_not_found() throws IOException {
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.relateItems(wrongRecommend.toRequest(), itemId));
+
+      Assertions.assertEquals(ErrorCode.INVALID_INPUT, e.getErrorCode());
+    }
+
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 대상 상품")
+    void fail_add_recommend_target_not_found() {
+      when(productRepository.findByItemId(itemId)).thenReturn(Optional.empty());
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.relateItems(mockRecommend.toRequest(), itemId));
+
+      Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+    }
+
+
   }
 
   @Nested
