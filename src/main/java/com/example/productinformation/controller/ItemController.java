@@ -1,5 +1,6 @@
 package com.example.productinformation.controller;
 
+import com.example.productinformation.domain.dto.DetailedProductInfo;
 import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
@@ -66,9 +67,21 @@ public class ItemController {
   @ResponseBody
   @Operation(summary = "[사용자] 상품 등록", description = "입력된 상품 정보를 토대로 DB 에 상품을 저장할 수 있다.")
   @PostMapping("/items/extra")
-  public Response<ProductInfo> registerItem(@RequestBody(required = false) ProductInfo productRequest) {
+  public Response<ProductInfo> registerItem(
+      @RequestBody(required = false) ProductInfo productRequest) {
 
     ProductInfo response = itemService.extraProduct(productRequest);
+
+    return Response.success(response);
+  }
+
+  @ResponseBody
+  @Operation(summary = "[사용자] 연관 상품 등록", description = "입력된 연관 상품 정보를 토대로 DB 에 연관 상품을 저장할 수 있다.")
+  @PostMapping("/items/chain")
+  public Response<SingeRecommendResponse> registerRecommend(
+      @RequestBody(required = false) DetailedProductInfo recommendRequest, Long targetItemId) {
+
+    ProductInfo response = itemService.relateItems(recommendRequest, targetItemId);
 
     return Response.success(response);
   }
