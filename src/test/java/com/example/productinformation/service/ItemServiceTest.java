@@ -83,7 +83,7 @@ class ItemServiceTest {
     wrongProduct = ProductFixture.getWrong();
   }
 
-//  @Nested
+  //  @Nested
 //  @DisplayName("상품 등록")
 //  class ProductCreation {
 //    @Test
@@ -102,6 +102,7 @@ class ItemServiceTest {
   @Nested
   @DisplayName("상품 등록")
   class ProductCreation {
+
     @Test
     @DisplayName("성공")
     void success_create_product() throws IOException {
@@ -115,12 +116,25 @@ class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("실패")
-    void fail_create_product() {
+    @DisplayName("실패 - 고유 아이디가 주어지지 않음")
+    void fail_create_product_no_id() {
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.extraProduct(wrongProduct.toRequest()));
 
       Assertions.assertEquals(ErrorCode.INVALID_INPUT, e.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("실패 - 이미 존재하는 고유 아이디")
+    void fail_create_product_duplicate_id() {
+      when(productRepository.findByItemId(itemId)).thenReturn(Optional.of(mockProduct));
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.extraProduct(mockProduct.toRequest()));
+
+      Assertions.assertEquals(ErrorCode.DUPLICATE_ITEM, e.getErrorCode());
+
+      verify(productRepository).findByItemId(itemId);
     }
   }
 
@@ -158,7 +172,7 @@ class ItemServiceTest {
 
       Assertions.assertEquals(id, secondId);
 
-      verify(productRepository,times(2)).findByItemId(any());
+      verify(productRepository, times(2)).findByItemId(any());
       verify(recommendRepository).findAllByTarget(mockProduct);
     }
 
