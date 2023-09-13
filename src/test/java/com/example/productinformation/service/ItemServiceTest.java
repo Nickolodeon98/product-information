@@ -67,10 +67,10 @@ class ItemServiceTest {
 
     mockRecommend = Recommend.builder()
         .id(1L)
-        .targetItem(mockProduct)
+        .target(mockProduct)
         .itemId(300373871L)
         .score(20)
-        .rank(1)
+        .ranking(1)
         .build();
 
     products = new ArrayList<>();
