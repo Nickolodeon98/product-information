@@ -9,6 +9,8 @@ import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.entity.Recommend;
+import com.example.productinformation.fixture.ProductFixture;
+import com.example.productinformation.fixture.RecommendFixture;
 import com.example.productinformation.parser.ReadLineContext;
 import com.example.productinformation.repository.ProductRepository;
 import com.example.productinformation.repository.RecommendRepository;
@@ -55,23 +57,18 @@ class ItemServiceTest {
   List<Product> products;
   List<Recommend> recommends;
   FileRequest fileRequest;
+  Long itemId;
+
   @BeforeEach
   void setUp() {
     sampleLine1 = "\"300002285\",\"아비루즈 ha-15\",\"//image.wconcept.co.kr/productimg/image/img2/85/300002285.jpg\",\"m.wconcept.co.kr/product/300002285\",\"5900\",\"5900\"";
     sampleLine2 = "\"300002301\",\"아비루즈 bt-16\",\"//image.wconcept.co.kr/productimg/image/img2/01/300002301.jpg\",\"m.wconcept.co.kr/product/300002301\",\"5900\",\"5900\"";
     sampleLine3 = "\"300003606\",\"CANVAS TOTE BAG-BROWN\",\"//image.wconcept.co.kr/productimg/image/img2/06/300003606.jpg\",\"m.wconcept.co.kr/product/300003606\",\"98000\",\"98000\"";
 
-    mockProduct = Product.builder().itemId(300002285L).itemName("아비루즈 ha-15")
-        .itemImage("//image.wconcept.co.kr/productimg/image/img2/85/300002285.jpg")
-        .itemUrl("m.wconcept.co.kr/product/300002285").originalPrice(5900).salePrice(5900).build();
+    itemId = 300002285L;
+    mockProduct = ProductFixture.get(itemId);
 
-    mockRecommend = Recommend.builder()
-        .id(1L)
-        .target(mockProduct)
-        .itemId(300373871L)
-        .score(20)
-        .ranking(1)
-        .build();
+    mockRecommend = RecommendFixture.get(itemId);
 
     products = new ArrayList<>();
     products.add(mockProduct);
