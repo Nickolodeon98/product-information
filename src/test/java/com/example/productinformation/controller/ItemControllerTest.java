@@ -9,11 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
+import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
 import com.example.productinformation.service.ItemService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,7 +26,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest
+@WebMvcTest(ItemController.class)
+@Slf4j
 class ItemControllerTest {
 
   @Autowired
@@ -39,14 +42,25 @@ class ItemControllerTest {
   FileRequest fileRequest;
 
   List<Recommend> recommends;
+  Recommend mockRecommend;
 
-  final String url = "/item/relevance";
+  final String url = "/items/relevance";
 
   @BeforeEach
   void setUp() {
     fileRequest = FileRequest.builder()
         .filename("filename")
         .build();
+    mockRecommend = Recommend.builder()
+        .id(1L)
+        .itemId(300373871L)
+        .target(Product.builder().build())
+        .score(20)
+        .ranking(1)
+        .build();
+
+    recommends = new ArrayList<>();
+    recommends.add(mockRecommend);
   }
 
   @Nested
@@ -56,8 +70,13 @@ class ItemControllerTest {
     @Test
     @DisplayName("성공")
     public void recommend_success() throws Exception {
+      log.info("recommendsId:{}", recommends.get(0).getId());
+
+      // given
       given(itemService.createRecommend(fileRequest))
           .willReturn(RecommendResponse.of(recommends, "등록 완료"));
+
+      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "등록 완료").getMessage());
 
       mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsBytes(fileRequest)))
