@@ -1,6 +1,7 @@
 package com.example.productinformation.domain.entity;
 
 
+import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,7 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Product {
+public class Product implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -31,7 +32,4 @@ public class Product {
   // 상품의 가격이 22억을 넘는 경우는 없으므로 int 로 설정한다.
   private Integer originalPrice;
   private Integer salePrice;
-
-  @OneToMany(mappedBy = "target")
-  List<Recommend> recommends;
 }
