@@ -15,13 +15,14 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ItemResponse {
-  private List<Product> products;
-  private List<Recommend> recommends;
+
+  private List<Product> target;
+  private List<Recommend> results;
 
   public static ItemResponse of(List<Product> products, List<Recommend> recommends) {
     return ItemResponse.builder()
-        .products(products)
-        .recommends(recommends)
+        .target(products)
+        .results(recommends)
         .build();
   }
 }
