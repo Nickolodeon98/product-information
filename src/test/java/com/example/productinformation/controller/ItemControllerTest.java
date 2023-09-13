@@ -2,15 +2,20 @@ package com.example.productinformation.controller;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.productinformation.domain.dto.DetailedInfo;
+import com.example.productinformation.domain.dto.TargetInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
+import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
+import com.example.productinformation.fixture.ProductFixture;
+import com.example.productinformation.fixture.RecommendFixture;
 import com.example.productinformation.service.ItemService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -32,35 +37,39 @@ class ItemControllerTest {
 
   @Autowired
   MockMvc mockMvc;
-
   @MockBean
   ItemService itemService;
-
   @Autowired
   ObjectMapper objectMapper;
-
   FileRequest fileRequest;
-
+  Product mockItem;
+  List<Product> products;
   List<Recommend> recommends;
+  List<DetailedInfo> detailedInfos;
   Recommend mockRecommend;
-
-  final String url = "/items/relevance";
-
+  Long itemId;
+  String severalIds;
+  final String url = "/rec/items/relevance";
+  final String acquireUrl = "/rec";
   @BeforeEach
   void setUp() {
     fileRequest = FileRequest.builder()
         .filename("filename")
         .build();
-    mockRecommend = Recommend.builder()
-        .id(1L)
-        .itemId(300373871L)
-        .target(Product.builder().build())
-        .score(20)
-        .ranking(1)
-        .build();
 
+    itemId = 300002285L;
+    severalIds = "300002285,300002301,300003606";
+
+    mockRecommend = RecommendFixture.get(itemId);
     recommends = new ArrayList<>();
     recommends.add(mockRecommend);
+
+    mockItem = ProductFixture.get(itemId);
+    products = new ArrayList<>();
+    products.add(mockItem);
+
+    detailedInfos = new ArrayList<>();
+    detailedInfos.add(DetailedInfo.of(mockItem,mockRecommend));
   }
 
   @Nested
@@ -69,7 +78,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("성공")
-    public void recommend_success() throws Exception {
+    void recommend_success() throws Exception {
       log.info("recommendsId:{}", recommends.get(0).getId());
 
       // given
@@ -87,6 +96,52 @@ class ItemControllerTest {
 
       verify(itemService).createRecommend(fileRequest);
     }
+  }
+
+  @Nested
+  @DisplayName("상품 조회")
+  class ItemSearch {
+
+    @Test
+    @DisplayName("성공 - 단건")
+    void item_search_success() throws Exception {
+
+      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(TargetInfo.of(products), detailedInfos));
+
+      mockMvc.perform(get(acquireUrl)
+              .param("id", String.valueOf(itemId)))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+          .andExpect(jsonPath("$.result.target[0].itemId").value(itemId))
+          .andExpect(jsonPath("$.result.results[0].score").value(20))
+          .andDo(print());
+
+      verify(itemService).acquireItem(String.valueOf(itemId));
+    }
+
+
+    @Test
+    @DisplayName("성공 - 다수")
+    void several_item_search_success() throws Exception {
+      Product product2 = ProductFixture.get(300002301L);
+      Product product3 = ProductFixture.get(300003606L);
+
+      products.add(product2);
+      products.add(product3);
+
+      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(TargetInfo.of(products), detailedInfos));
+
+      mockMvc.perform(get(acquireUrl)
+              .param("id", severalIds))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+          .andExpect(jsonPath("$.result.target[0].itemId").value(itemId))
+          .andExpect(jsonPath("$.result.results[0].score").value(20))
+          .andDo(print());
+
+      verify(itemService).acquireItem(severalIds);
+    }
+
   }
 
 }
