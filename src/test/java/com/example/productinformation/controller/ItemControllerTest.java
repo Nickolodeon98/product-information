@@ -11,6 +11,7 @@ import com.example.productinformation.domain.dto.DetailedInfo;
 import com.example.productinformation.domain.dto.TargetInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
+import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
@@ -42,6 +43,7 @@ class ItemControllerTest {
   @Autowired
   ObjectMapper objectMapper;
   FileRequest fileRequest;
+  ProductRequest productRequest;
   Product mockItem;
   List<Product> products;
   List<Recommend> recommends;
@@ -51,6 +53,7 @@ class ItemControllerTest {
   String severalIds;
   final String url = "/rec/items/relevance";
   final String acquireUrl = "/rec";
+  final String extraUrl = "/rec/items/extra";
   @BeforeEach
   void setUp() {
     fileRequest = FileRequest.builder()
@@ -72,29 +75,51 @@ class ItemControllerTest {
     detailedInfos.add(DetailedInfo.of(mockItem,mockRecommend));
   }
 
+//  @Nested
+//  @DisplayName("연관 상품 등록")
+//  class RecommendRegistration {
+//
+//    @Test
+//    @DisplayName("성공")
+//    void recommend_success() throws Exception {
+//      log.info("recommendsId:{}", recommends.get(0).getId());
+//
+//      // given
+//      given(itemService.createRecommend(fileRequest))
+//          .willReturn(RecommendResponse.of(recommends, "등록 완료"));
+//
+//      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "등록 완료").getMessage());
+//
+//      mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
+//          .content(objectMapper.writeValueAsBytes(fileRequest)))
+//          .andExpect(status().isOk())
+//          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+//          .andExpect(jsonPath("$.result.message").value("등록 완료"))
+//          .andDo(print());
+//
+//      verify(itemService).createRecommend(fileRequest);
+//    }
+//  }
+
   @Nested
-  @DisplayName("연관 상품 등록")
+  @DisplayName("상품 등록")
   class RecommendRegistration {
 
     @Test
     @DisplayName("성공")
     void recommend_success() throws Exception {
-      log.info("recommendsId:{}", recommends.get(0).getId());
-
       // given
-      given(itemService.createRecommend(fileRequest))
-          .willReturn(RecommendResponse.of(recommends, "등록 완료"));
+      given(itemService.extraProduct(productRequest))
+          .willReturn(ExtraProductResponse.of(mockItem, "등록 완료"));
 
-      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "등록 완료").getMessage());
-
-      mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsBytes(fileRequest)))
+      mockMvc.perform(post(extraUrl).contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsBytes(productRequest)))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
           .andExpect(jsonPath("$.result.message").value("등록 완료"))
           .andDo(print());
 
-      verify(itemService).createRecommend(fileRequest);
+      verify(itemService).extraProduct(productRequest);
     }
   }
 
