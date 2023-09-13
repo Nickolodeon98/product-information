@@ -1,6 +1,5 @@
 package com.example.productinformation.controller;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -64,7 +63,7 @@ class ItemControllerTest {
 
     mockItem = ProductFixture.get(itemId);
     products = new ArrayList<>();
-    products.add(mockItem)
+    products.add(mockItem);
   }
 
   @Nested
@@ -117,7 +116,7 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("성공 - 다수")
-    void item_search_success() throws Exception {
+    void several_item_search_success() throws Exception {
       Product product2 = ProductFixture.get(300002301L);
       Product product3 = ProductFixture.get(300003606L);
 
