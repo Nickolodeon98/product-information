@@ -1,6 +1,7 @@
 package com.example.productinformation.controller;
 
 import com.example.productinformation.domain.dto.request.FileRequest;
+import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.Response;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
@@ -55,7 +56,7 @@ public class ItemController {
   public Response<ItemResponse> searchItems(@RequestParam("id") String itemId) {
 
     // itemId 를 Long 으로 변환해준다.
-    ItemResponse itemResponse = itemService.acquireItem(Long.valueOf(itemId));
+    ItemResponse itemResponse = itemService.acquireItem(itemId);
 
     return Response.success(itemResponse);
   }
