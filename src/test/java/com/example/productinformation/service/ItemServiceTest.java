@@ -60,6 +60,7 @@ class ItemServiceTest {
   List<Recommend> recommends;
   FileRequest fileRequest;
   Long itemId;
+  Product wrongProduct;
 
   @BeforeEach
   void setUp() {
@@ -78,22 +79,53 @@ class ItemServiceTest {
     recommends = new ArrayList<>();
     recommends.add(mockRecommend);
     fileRequest = FileRequest.builder().filename("filename").build();
+
+    productRequest = mockProduct.toRequest();
+    wrongProduct = ProductFixture.getWrong();
   }
 
+//  @Nested
+//  @DisplayName("상품 등록")
+//  class ProductCreation {
+//    @Test
+//    @DisplayName("성공")
+//    void success_create_product() throws IOException {
+//      when(productReadLineContext.readLines("filename")).thenReturn(products);
+//      when(productRepository.saveAll(any())).thenReturn(products);
+//
+//      ProductResponse response = itemService.createProduct(fileRequest);
+//
+//      Assertions.assertEquals(products.get(0).getId(), response.getProductIds().get(0));
+//
+//      verify(productRepository).saveAll(any());
+//    }
+//  }
   @Nested
   @DisplayName("상품 등록")
   class ProductCreation {
     @Test
     @DisplayName("성공")
     void success_create_product() throws IOException {
-      when(productReadLineContext.readLines("filename")).thenReturn(products);
-      when(productRepository.saveAll(any())).thenReturn(products);
+      when(productRepository.save(any())).thenReturn(mockProduct);
 
-      ProductResponse response = itemService.createProduct(fileRequest);
+      ExtraProductResponse response = itemService.extraProduct(mockProduct.toRequest());
 
-      Assertions.assertEquals(products.get(0).getId(), response.getProductIds().get(0));
+      Assertions.assertEquals(mockProduct.getItemId(), response.getItemId());
 
-      verify(productRepository).saveAll(any());
+      verify(productRepository).save(any());
+    }
+
+    @Test
+    @DisplayName("실패")
+    void fail_create_product() {
+      when(productRepository.save(any())).thenReturn(wrongProduct);
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.extraProduct(wrongProduct.toRequest()));
+
+      Assertions.assertEquals(ErrorCode.INVALID_INPUT, e.getErrorCode());
+
+      verify(productRepository).save(any());
     }
   }
 
