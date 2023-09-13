@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.productinformation.domain.dto.request.FileRequest;
+import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
@@ -40,10 +41,12 @@ class ItemControllerTest {
   @Autowired
   ObjectMapper objectMapper;
   FileRequest fileRequest;
+  Product mockItem;
+  List<Product> products;
   List<Recommend> recommends;
   Recommend mockRecommend;
-  Product item;
   Long itemId;
+  String severalIds;
   final String url = "/rec/items/relevance";
   final String acquireUrl = "/rec";
   @BeforeEach
@@ -53,12 +56,15 @@ class ItemControllerTest {
         .build();
 
     itemId = 300002285L;
+    severalIds = "300002285,300002301,300003606";
 
     mockRecommend = RecommendFixture.get(itemId);
     recommends = new ArrayList<>();
     recommends.add(mockRecommend);
 
-    item = ProductFixture.get(itemId);
+    mockItem = ProductFixture.get(itemId);
+    products = new ArrayList<>();
+    products.add(mockItem)
   }
 
   @Nested
@@ -92,9 +98,10 @@ class ItemControllerTest {
   class ItemSearch {
 
     @Test
-    @DisplayName("성공")
+    @DisplayName("성공 - 단건")
     void item_search_success() throws Exception {
-      given(itemService.acquireItem(eq(itemId))).willReturn(ItemResponse.of(item, recommends));
+
+      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(products, recommends));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", String.valueOf(itemId)))
@@ -104,8 +111,32 @@ class ItemControllerTest {
           .andExpect(jsonPath("$.result.results[0].score").value(20))
           .andDo(print());
 
-      verify(itemService).acquireItem(eq(itemId));
+      verify(itemService).acquireItem(String.valueOf(itemId));
     }
+
+
+    @Test
+    @DisplayName("성공 - 다수")
+    void item_search_success() throws Exception {
+      Product product2 = ProductFixture.get(300002301L);
+      Product product3 = ProductFixture.get(300003606L);
+
+      products.add(product2);
+      products.add(product3);
+
+      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(products, recommends));
+
+      mockMvc.perform(get(acquireUrl)
+              .param("id", String.valueOf(itemId)))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+          .andExpect(jsonPath("$.result.target[0].itemId").value(itemId))
+          .andExpect(jsonPath("$.result.results[0].score").value(20))
+          .andDo(print());
+
+      verify(itemService).acquireItem(severalIds);
+    }
+
   }
 
 }
