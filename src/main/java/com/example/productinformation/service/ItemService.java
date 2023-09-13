@@ -1,5 +1,6 @@
 package com.example.productinformation.service;
 
+import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ProductResponse;
