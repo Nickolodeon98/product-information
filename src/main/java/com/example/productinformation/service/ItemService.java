@@ -1,7 +1,7 @@
 package com.example.productinformation.service;
 
-import com.example.productinformation.domain.dto.DetailedInfo;
-import com.example.productinformation.domain.dto.TargetInfo;
+import com.example.productinformation.domain.dto.DetailedProductInfo;
+import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
@@ -79,7 +79,7 @@ public class ItemService {
 
       recommends = recommendRepository.findAllByTargetIn(products);
 
-      return ItemResponse.of(TargetInfo.of(products), combineInfo(recommends));
+      return ItemResponse.of(ProductInfo.of(products), combineInfo(recommends));
     }
 
     Product product = productRepository.findByItemId(Long.valueOf(itemId))
@@ -93,7 +93,7 @@ public class ItemService {
 
     recommends = recommendRepository.findAllByTarget(product);
 
-    return ItemResponse.of(TargetInfo.of(products), combineInfo(recommends));
+    return ItemResponse.of(ProductInfo.of(products), combineInfo(recommends));
   }
 
   /**
@@ -101,8 +101,8 @@ public class ItemService {
    * @param recommends
    * @return List
    */
-  private List<DetailedInfo> combineInfo(List<Recommend> recommends) {
-    List<DetailedInfo> detailedInfos = new ArrayList<>();
+  private List<DetailedProductInfo> combineInfo(List<Recommend> recommends) {
+    List<DetailedProductInfo> detailedProductInfos = new ArrayList<>();
 
     for (Recommend recommend : recommends) {
       Product productInfo = productRepository.findByItemId(recommend.getItemId())
@@ -111,13 +111,25 @@ public class ItemService {
                 ErrorCode.ITEM_NOT_FOUND.getMessage());
           });
 
-      detailedInfos.add(DetailedInfo.of(productInfo, recommend));
+      detailedProductInfos.add(DetailedProductInfo.of(productInfo, recommend));
     }
 
-    return detailedInfos;
+    return detailedProductInfos;
   }
 
-  public TargetInfo extraProduct(ProductRequest productRequest) {
+  /**
+   * 입력으로 주어진 상품 정보를 DB에 저장한다.
+   * @param productRequest
+   * @return
+   */
+  public ProductInfo extraProduct(ProductInfo productRequest) {
+    if (productRequest.getItemId() == null) {
+      throw new ItemException(ErrorCode.INVALID_INPUT,
+          ErrorCode.INVALID_INPUT.getMessage());
+    }
 
+    Product savedProduct = productRepository.save(productRequest.toEntity());
+
+    return ProductInfo.of(savedProduct);
   }
 }

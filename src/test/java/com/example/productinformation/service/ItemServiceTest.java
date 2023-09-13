@@ -117,14 +117,10 @@ class ItemServiceTest {
     @Test
     @DisplayName("실패")
     void fail_create_product() {
-      when(productRepository.save(any())).thenReturn(wrongProduct);
-
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.extraProduct(wrongProduct.toRequest()));
 
       Assertions.assertEquals(ErrorCode.INVALID_INPUT, e.getErrorCode());
-
-      verify(productRepository).save(any());
     }
   }
 
