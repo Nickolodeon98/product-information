@@ -32,7 +32,7 @@ public class ItemController {
   private final ItemService itemService;
 
   @ResponseBody
-  @Operation(summary = "관리자 상품 등록", description = "입력된 파일 이름으로부터 상품 데이터를 추출하여 DB에 저장할 수 있다.")
+  @Operation(summary = "[관리자] 상품 등록", description = "입력된 파일 이름으로부터 상품 데이터를 추출하여 DB에 저장할 수 있다.")
   @PostMapping("/items/new")
   public Response<ProductResponse> registerItems(@RequestBody FileRequest fileRequest)
       throws IOException {
@@ -42,7 +42,7 @@ public class ItemController {
   }
 
   @ResponseBody
-  @Operation(summary = "관리자 연관 상품 등록", description = "입력된 파일 이름으로부터 연관 상품 데이터를 추출하여 DB에 저장할 수 있다.")
+  @Operation(summary = "[관리자] 연관 상품 등록", description = "입력된 파일 이름으로부터 연관 상품 데이터를 추출하여 DB에 저장할 수 있다.")
   @PostMapping("/items/relevance")
   public Response<RecommendResponse> registerRecommends(@RequestBody FileRequest fileRequest)
       throws IOException {
@@ -64,7 +64,7 @@ public class ItemController {
   }
 
   @ResponseBody
-  @Operation(summary = "사용자 상품 등록", description = "입력된 상품 정보를 토대로 DB 에 상품을 저장할 수 있다.")
+  @Operation(summary = "[사용자] 상품 등록", description = "입력된 상품 정보를 토대로 DB 에 상품을 저장할 수 있다.")
   @PostMapping("/items/extra")
   public Response<ProductInfo> registerItem(@RequestBody(required = false) ProductInfo productRequest) {
 
