@@ -19,7 +19,6 @@ import com.example.productinformation.exception.ItemException;
 import com.example.productinformation.fixture.ProductFixture;
 import com.example.productinformation.fixture.RecommendFixture;
 import com.example.productinformation.service.ItemService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +55,7 @@ class ItemControllerTest {
   final String url = "/rec/items/relevance";
   final String acquireUrl = "/rec";
   final String extraUrl = "/rec/items/extra";
+  final String extraRecommendUrl = "/rec/items/chain";
   @BeforeEach
   void setUp() {
     fileRequest = FileRequest.builder()
@@ -139,6 +139,48 @@ class ItemControllerTest {
           .andDo(print());
 
       verify(itemService).extraProduct(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("연관 상품 등록")
+  class RecommendRegistration {
+
+    @Test
+    @DisplayName("성공")
+    void success_register_recommend() throws Exception {
+      // given
+      given(itemService.relateItems(any(), any()))
+          .willReturn(SingleRecommendResponse.of(mockRecommend, "등록 완료"));
+
+      mockMvc.perform(post(extraRecommendUrl).contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsBytes(any()))
+              .content(objectMapper.writeValueAsBytes(any())))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+          .andExpect(jsonPath("$.result.itemId").value(itemId))
+          .andExpect(jsonPath("$.result.message").value("등록 완료"))
+          .andDo(print());
+
+      verify(itemService).relateItems(any(), any());
+    }
+
+    @Test
+    @DisplayName("실패")
+    void fail_register_product() throws Exception {
+      given(itemService.relateItems(any(), any()))
+          .willThrow(new ItemException(ErrorCode.INVALID_INPUT, ErrorCode.INVALID_INPUT.getMessage()));
+
+      mockMvc.perform(post(extraRecommendUrl).contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsBytes(any()))
+              .content(objectMapper.writeValueAsBytes(any())))
+          .andExpect(status().isNotAcceptable())
+          .andExpect(jsonPath("$.resultCode").value("ERROR"))
+          .andExpect(jsonPath("$.result.errorCode").value(ErrorCode.INVALID_INPUT.name()))
+          .andExpect(jsonPath("$.result.message").value(ErrorCode.INVALID_INPUT.getMessage()))
+          .andDo(print());
+
+      verify(itemService).relateItems(any(), any());
     }
   }
 
