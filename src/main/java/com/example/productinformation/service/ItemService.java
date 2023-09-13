@@ -48,8 +48,7 @@ public class ItemService {
     if (itemId.contains(",")) {
       String[] ids = itemId.split(",");
       for (String id : ids) {
-        Product product = productRepository.findByItemId(Long.valueOf(id))
-            .orElseThrow(() -> new IllegalArgumentException());
+        Product product = productRepository.findByItemId(Long.valueOf(id)).get();
         products.add(product);
         recommends = recommendRepository.findAllByTarget(product);
       }

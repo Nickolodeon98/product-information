@@ -18,6 +18,7 @@ import com.example.productinformation.repository.RecommendRepository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -128,7 +129,7 @@ class ItemServiceTest {
     @Test
     @DisplayName("성공")
     void success_search_item() {
-      when(productRepository.findByItemId(any())).thenReturn(mockProduct);
+      when(productRepository.findByItemId(any())).thenReturn(Optional.of(mockProduct));
       when(recommendRepository.findAllByTarget(mockProduct)).thenReturn(recommends);
 
       ItemResponse itemResponse = itemService.acquireItem(String.valueOf(itemId));
