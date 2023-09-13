@@ -4,11 +4,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
-import com.example.productinformation.domain.dto.request.ProductRequest;
+import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ProductResponse;
+import com.example.productinformation.domain.entity.Recommend;
 import com.example.productinformation.parser.ReadLineContext;
 import com.example.productinformation.repository.ProductRepository;
+import com.example.productinformation.repository.RecommendRepository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,23 +30,31 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest
 // @ExtendWith 를 활용해 ...
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
-class ProductServiceTest {
+class ItemServiceTest {
 
   @Mock
   ReadLineContext<Product> productReadLineContext;
 
   @Mock
+  ReadLineContext<Recommend> recommendReadLineContext;
+
+  @Mock
   ProductRepository productRepository;
 
+  @Mock
+  RecommendRepository recommendRepository;
+
   @InjectMocks
-  ProductService productService;
+  ItemService itemService;
 
   String sampleLine1;
   String sampleLine2;
   String sampleLine3;
   Product mockProduct;
+  Recommend mockRecommend;
   List<Product> products;
-  ProductRequest productRequest;
+  List<Recommend> recommends;
+  FileRequest fileRequest;
   @BeforeEach
   void setUp() {
     sampleLine1 = "\"300002285\",\"아비루즈 ha-15\",\"//image.wconcept.co.kr/productimg/image/img2/85/300002285.jpg\",\"m.wconcept.co.kr/product/300002285\",\"5900\",\"5900\"";
@@ -54,9 +65,20 @@ class ProductServiceTest {
         .itemImage("//image.wconcept.co.kr/productimg/image/img2/85/300002285.jpg")
         .itemUrl("m.wconcept.co.kr/product/300002285").originalPrice(5900).salePrice(5900).build();
 
+    mockRecommend = Recommend.builder()
+        .id(1L)
+        .target(mockProduct)
+        .itemId(300373871L)
+        .score(20)
+        .ranking(1)
+        .build();
+
     products = new ArrayList<>();
     products.add(mockProduct);
-    productRequest = ProductRequest.builder().filename("filename").build();
+
+    recommends = new ArrayList<>();
+    recommends.add(mockRecommend);
+    fileRequest = FileRequest.builder().filename("filename").build();
   }
 
   @Nested
@@ -69,28 +91,35 @@ class ProductServiceTest {
       when(productReadLineContext.readLines("filename")).thenReturn(products);
       when(productRepository.saveAll(any())).thenReturn(products);
 
-      ProductResponse response = productService.createProduct(productRequest);
+      ProductResponse response = itemService.createProduct(fileRequest);
 
-      Assertions.assertEquals(List.of(products.get(0).getId()), response.getProductIds().get(0));
+      Assertions.assertEquals(products.get(0).getId(), response.getProductIds().get(0));
 
-      verify(productRepository).save(any());
+      verify(productRepository).saveAll(any());
     }
   }
 
-//  @Nested
-//  @DisplayName("아이템 조회")
-//  class ProductAcquisition {
-//
-//    @Test
-//    @DisplayName("성공")
-//    void success_read_product() {
-//      when(productRepository.findById())
-//    }
-//
-//    @Test
-//    @DisplayName("실패")
-//    void fail_read_product() {
-//
-//    }
-//  }
+  @Nested
+  @DisplayName("연관 상품 등록")
+  class ProductAcquisition {
+
+    @Test
+    @DisplayName("성공")
+    void success_read_product() throws IOException {
+      when(recommendReadLineContext.readLines("filename")).thenReturn(recommends);
+      when(recommendRepository.saveAll(any())).thenReturn(recommends);
+
+      RecommendResponse response = itemService.createRecommend(fileRequest);
+
+      Assertions.assertEquals(recommends.get(0).getId(), response.getRecommendIds().get(0));
+
+      verify(recommendRepository).saveAll(any());
+    }
+
+    @Test
+    @DisplayName("실패")
+    void fail_read_product() {
+
+    }
+  }
 }

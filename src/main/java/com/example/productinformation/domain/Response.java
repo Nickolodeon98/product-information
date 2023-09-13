@@ -2,10 +2,12 @@ package com.example.productinformation.domain;
 
 import com.example.productinformation.domain.dto.response.ProductResponse;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
 @AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class Response<T> {
   private String resultCode;
   private T result;

@@ -22,7 +22,6 @@ public class ReadLineContext<T> {
     BufferedReader reader = null;
 
     reader = Files.newBufferedReader(Paths.get(filename));
-    reader.readLine();
 
     while ((str = reader.readLine()) != null) {
       try {
