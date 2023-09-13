@@ -126,7 +126,7 @@ class ItemControllerTest {
       given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(products, recommends));
 
       mockMvc.perform(get(acquireUrl)
-              .param("id", String.valueOf(itemId)))
+              .param("id", severalIds))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
           .andExpect(jsonPath("$.result.target[0].itemId").value(itemId))
