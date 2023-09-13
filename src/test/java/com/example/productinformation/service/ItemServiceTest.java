@@ -129,14 +129,14 @@ class ItemServiceTest {
     @DisplayName("성공")
     void success_search_item() {
       when(productRepository.findByItemId(any())).thenReturn(mockProduct);
-      when(recommendRepository.findAllByTargetItem(mockProduct)).thenReturn(recommends);
+      when(recommendRepository.findAllByTarget(mockProduct)).thenReturn(recommends);
 
       ItemResponse itemResponse = itemService.acquireItem(String.valueOf(itemId));
 
       Assertions.assertEquals(recommends.get(0), itemResponse.getRecommends().get(0));
 
       verify(productRepository).findByItemId(any());
-      verify(recommendRepository).findByTargetItemId(any());
+      verify(recommendRepository).findAllByTarget(any());
     }
   }
 }
