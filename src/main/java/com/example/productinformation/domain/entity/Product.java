@@ -1,14 +1,12 @@
 package com.example.productinformation.domain.entity;
 
 
-import com.example.productinformation.domain.dto.TargetInfo;
+import com.example.productinformation.domain.dto.ProductInfo;
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,8 +32,8 @@ public class Product implements Serializable {
   private Integer originalPrice;
   private Integer salePrice;
 
-  public TargetInfo toRequest() {
-    return TargetInfo.builder()
+  public ProductInfo toRequest() {
+    return ProductInfo.builder()
         .itemId(this.itemId)
         .itemName(this.itemName)
         .itemImage(this.itemImage)

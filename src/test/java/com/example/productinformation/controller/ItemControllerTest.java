@@ -7,8 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.productinformation.domain.dto.DetailedInfo;
-import com.example.productinformation.domain.dto.TargetInfo;
+import com.example.productinformation.domain.dto.DetailedProductInfo;
+import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.entity.Product;
@@ -41,11 +41,11 @@ class ItemControllerTest {
   @Autowired
   ObjectMapper objectMapper;
   FileRequest fileRequest;
-  TargetInfo productRequest;
+  ProductInfo productRequest;
   Product mockItem;
   List<Product> products;
   List<Recommend> recommends;
-  List<DetailedInfo> detailedInfos;
+  List<DetailedProductInfo> detailedProductInfos;
   Recommend mockRecommend;
   Long itemId;
   String severalIds;
@@ -69,8 +69,8 @@ class ItemControllerTest {
     products = new ArrayList<>();
     products.add(mockItem);
 
-    detailedInfos = new ArrayList<>();
-    detailedInfos.add(DetailedInfo.of(mockItem,mockRecommend));
+    detailedProductInfos = new ArrayList<>();
+    detailedProductInfos.add(DetailedProductInfo.of(mockItem,mockRecommend));
   }
 
 //  @Nested
@@ -108,7 +108,7 @@ class ItemControllerTest {
     void recommend_success() throws Exception {
       // given
       given(itemService.extraProduct(productRequest))
-          .willReturn(TargetInfo.of(mockItem));
+          .willReturn(ProductInfo.of(mockItem));
 
       mockMvc.perform(post(extraUrl).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsBytes(productRequest)))
@@ -129,7 +129,8 @@ class ItemControllerTest {
     @DisplayName("성공 - 단건")
     void item_search_success() throws Exception {
 
-      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(TargetInfo.of(products), detailedInfos));
+      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(ProductInfo.of(products),
+          detailedProductInfos));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", String.valueOf(itemId)))
@@ -152,7 +153,8 @@ class ItemControllerTest {
       products.add(product2);
       products.add(product3);
 
-      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(TargetInfo.of(products), detailedInfos));
+      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(ProductInfo.of(products),
+          detailedProductInfos));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", severalIds))

@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TargetInfo {
+public class ProductInfo {
 
   private Long itemId;
   private String itemName;
@@ -23,8 +23,8 @@ public class TargetInfo {
   private Integer originalPrice;
   private Integer salePrice;
 
-  public static TargetInfo of(Product product) {
-    return TargetInfo.builder()
+  public static ProductInfo of(Product product) {
+    return ProductInfo.builder()
         .itemId(product.getItemId())
         .itemName(product.getItemName())
         .itemImage(product.getItemImage())
@@ -34,11 +34,22 @@ public class TargetInfo {
         .build();
   }
 
-  public static List<TargetInfo> of(List<Product> products) {
-    List<TargetInfo> targetInfos = new ArrayList<>();
+  public static List<ProductInfo> of(List<Product> products) {
+    List<ProductInfo> productInfos = new ArrayList<>();
     for (Product product : products) {
-      targetInfos.add(TargetInfo.of(product));
+      productInfos.add(ProductInfo.of(product));
     }
-    return targetInfos;
+    return productInfos;
+  }
+
+  public Product toEntity() {
+    return Product.builder()
+        .itemId(this.itemId)
+        .itemName(this.itemName)
+        .itemImage(this.itemImage)
+        .itemUrl(this.itemUrl)
+        .originalPrice(this.originalPrice)
+        .salePrice(this.salePrice)
+        .build();
   }
 }

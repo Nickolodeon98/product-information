@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DetailedInfo {
+public class DetailedProductInfo {
 
   private Long itemId;
   private String itemName;
@@ -24,8 +24,8 @@ public class DetailedInfo {
   private Integer score;
   private Integer rank;
 
-  public static DetailedInfo of(Product productInfo, Recommend recommend) {
-    return DetailedInfo.builder()
+  public static DetailedProductInfo of(Product productInfo, Recommend recommend) {
+    return DetailedProductInfo.builder()
         .itemId(recommend.getItemId())
         .itemName(productInfo.getItemName() == null ? null : productInfo.getItemName())
         .itemImage(productInfo.getItemImage() == null ? null : productInfo.getItemImage())
