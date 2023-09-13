@@ -22,7 +22,7 @@ public class DetailedInfo {
   private Integer originalPrice;
   private Integer salePrice;
   private Integer score;
-  private Integer ranking;
+  private Integer rank;
 
   public static DetailedInfo of(Product productInfo, Recommend recommend) {
     return DetailedInfo.builder()
@@ -33,7 +33,7 @@ public class DetailedInfo {
         .originalPrice(productInfo.getOriginalPrice() == null ? null : productInfo.getOriginalPrice())
         .salePrice(productInfo.getSalePrice() == null ? null : productInfo.getSalePrice())
         .score(recommend.getScore())
-        .ranking(recommend.getRanking())
+        .rank(recommend.getRanking())
         .build();
   }
 }
