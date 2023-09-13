@@ -1,6 +1,8 @@
 package com.example.productinformation.domain.dto;
 
 import com.example.productinformation.domain.entity.Product;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class ProductInfo {
 
   private Long itemId;
