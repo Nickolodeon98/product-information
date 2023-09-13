@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>{
   Optional<Product> findByItemId(Long itemId);
-  Optional<List<Product>> findAllByItemIdIn(String[] itemIds);
+  Optional<List<Product>> findAllByItemIdIn(Long[] itemIds);
 }
