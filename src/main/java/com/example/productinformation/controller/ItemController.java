@@ -12,9 +12,11 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -46,5 +48,18 @@ public class ItemController {
 
     return Response.success(recommendResponse);
   }
+
+  @ResponseBody
+  @Operation(summary="상품 조회", description = "상품 정보 및 연관 상품에 대한 조회")
+  @GetMapping
+  public Response<ItemResponse> searchItems(@RequestParam("id") String itemId) {
+
+    // itemId 를 Long 으로 변환해준다.
+    ItemResponse itemResponse = itemService.acquireItem(Long.valueOf(itemId));
+
+    return Response.success(itemResponse);
+  }
+
+
 
 }
