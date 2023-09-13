@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface RecommendRepository extends JpaRepository<Recommend, Long> {
 
   List<Recommend> findAllByTarget(Product product);
+
+  List<Recommend> findAllByTargetIn(List<Product> products);
 }
