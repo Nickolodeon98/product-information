@@ -32,6 +32,6 @@ public class Product {
   private Integer originalPrice;
   private Integer salePrice;
 
-  @OneToMany(mappedBy = "targetItem")
+  @OneToMany(mappedBy = "target")
   List<Recommend> recommends;
 }

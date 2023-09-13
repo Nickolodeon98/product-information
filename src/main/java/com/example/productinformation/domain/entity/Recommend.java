@@ -24,12 +24,13 @@ public class Recommend {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
   private Long itemId;
 
   @ManyToOne
   @JoinColumn(referencedColumnName = "itemId")
-  private Product targetItem;
+  private Product target;
 
   private Integer score;
-  private Integer rank;
+  private Integer ranking;
 }
