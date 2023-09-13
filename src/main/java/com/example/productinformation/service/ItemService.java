@@ -52,7 +52,13 @@ public class ItemService {
         products.add(product);
         recommends = recommendRepository.findAllByTarget(product);
       }
+      return ItemResponse.of(products, recommends);
     }
+
+    Product product = productRepository.findByItemId(Long.valueOf(itemId)).get();
+
+    products.add(product);
+    recommends = recommendRepository.findAllByTarget(product);
 
     return ItemResponse.of(products, recommends);
   }

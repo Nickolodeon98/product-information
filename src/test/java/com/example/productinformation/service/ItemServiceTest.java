@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.dto.request.FileRequest;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,12 +28,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest
-// @ExtendWith 를 활용해 ...
-@ExtendWith({MockitoExtension.class, SpringExtension.class})
+@ExtendWith(MockitoExtension.class)
+@Slf4j
 class ItemServiceTest {
 
   @Mock
@@ -114,12 +111,6 @@ class ItemServiceTest {
 
       verify(recommendRepository).saveAll(any());
     }
-
-    @Test
-    @DisplayName("실패")
-    void fail_add_product() {
-
-    }
   }
 
   @Nested
@@ -132,12 +123,19 @@ class ItemServiceTest {
       when(productRepository.findByItemId(any())).thenReturn(Optional.of(mockProduct));
       when(recommendRepository.findAllByTarget(mockProduct)).thenReturn(recommends);
 
-      ItemResponse itemResponse = itemService.acquireItem(String.valueOf(itemId));
+      Long id = recommends.get(0).getItemId();
+      Long secondId = itemService.acquireItem(String.valueOf(itemId)).getResults().get(0).getItemId();
 
-      Assertions.assertEquals(recommends.get(0), itemResponse.getRecommends().get(0));
+      Assertions.assertEquals(id, secondId);
 
       verify(productRepository).findByItemId(any());
-      verify(recommendRepository).findAllByTarget(any());
+      verify(recommendRepository).findAllByTarget(mockProduct);
+    }
+
+    @Test
+    @DisplayName("실패")
+    void fail_search_item() {
+
     }
   }
 }
