@@ -1,6 +1,7 @@
 package com.example.productinformation.domain.entity;
 
 
+import com.example.productinformation.domain.dto.TargetInfo;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
@@ -32,4 +33,15 @@ public class Product implements Serializable {
   // 상품의 가격이 22억을 넘는 경우는 없으므로 int 로 설정한다.
   private Integer originalPrice;
   private Integer salePrice;
+
+  public TargetInfo toRequest() {
+    return TargetInfo.builder()
+        .itemId(this.itemId)
+        .itemName(this.itemName)
+        .itemImage(this.itemImage)
+        .itemUrl(this.itemUrl)
+        .originalPrice(this.originalPrice)
+        .salePrice(this.salePrice)
+        .build();
+  }
 }

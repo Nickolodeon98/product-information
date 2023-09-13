@@ -41,7 +41,7 @@ class ItemControllerTest {
   @Autowired
   ObjectMapper objectMapper;
   FileRequest fileRequest;
-  ProductRequest productRequest;
+  TargetInfo productRequest;
   Product mockItem;
   List<Product> products;
   List<Recommend> recommends;
