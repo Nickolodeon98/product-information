@@ -23,19 +23,21 @@ public class TargetInfo {
   private Integer originalPrice;
   private Integer salePrice;
 
+  public static TargetInfo of(Product product) {
+    return TargetInfo.builder()
+        .itemId(product.getItemId())
+        .itemName(product.getItemName())
+        .itemImage(product.getItemImage())
+        .itemUrl(product.getItemUrl())
+        .originalPrice(product.getOriginalPrice())
+        .salePrice(product.getSalePrice())
+        .build();
+  }
+
   public static List<TargetInfo> of(List<Product> products) {
     List<TargetInfo> targetInfos = new ArrayList<>();
     for (Product product : products) {
-      TargetInfo targetInfo = TargetInfo.builder()
-          .itemId(product.getItemId())
-          .itemName(product.getItemName())
-          .itemImage(product.getItemImage())
-          .itemUrl(product.getItemUrl())
-          .originalPrice(product.getOriginalPrice())
-          .salePrice(product.getSalePrice())
-          .build();
-
-      targetInfos.add(targetInfo);
+      targetInfos.add(TargetInfo.of(product));
     }
     return targetInfos;
   }

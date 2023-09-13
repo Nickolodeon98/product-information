@@ -5,10 +5,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.productinformation.domain.dto.TargetInfo;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.dto.request.FileRequest;
-import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.entity.Recommend;
 import com.example.productinformation.exception.ErrorCode;
 import com.example.productinformation.exception.ItemException;
@@ -80,7 +80,6 @@ class ItemServiceTest {
     recommends.add(mockRecommend);
     fileRequest = FileRequest.builder().filename("filename").build();
 
-    productRequest = mockProduct.toRequest();
     wrongProduct = ProductFixture.getWrong();
   }
 
@@ -108,7 +107,7 @@ class ItemServiceTest {
     void success_create_product() throws IOException {
       when(productRepository.save(any())).thenReturn(mockProduct);
 
-      ExtraProductResponse response = itemService.extraProduct(mockProduct.toRequest());
+      TargetInfo response = itemService.extraProduct(mockProduct.toRequest());
 
       Assertions.assertEquals(mockProduct.getItemId(), response.getItemId());
 

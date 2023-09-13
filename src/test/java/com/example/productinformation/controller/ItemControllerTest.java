@@ -11,8 +11,6 @@ import com.example.productinformation.domain.dto.DetailedInfo;
 import com.example.productinformation.domain.dto.TargetInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
-import com.example.productinformation.domain.dto.response.ProductResponse;
-import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
 import com.example.productinformation.fixture.ProductFixture;
@@ -110,13 +108,13 @@ class ItemControllerTest {
     void recommend_success() throws Exception {
       // given
       given(itemService.extraProduct(productRequest))
-          .willReturn(ExtraProductResponse.of(mockItem, "등록 완료"));
+          .willReturn(TargetInfo.of(mockItem));
 
       mockMvc.perform(post(extraUrl).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsBytes(productRequest)))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-          .andExpect(jsonPath("$.result.message").value("등록 완료"))
+          .andExpect(jsonPath("$.result.itemId").value(itemId))
           .andDo(print());
 
       verify(itemService).extraProduct(productRequest);

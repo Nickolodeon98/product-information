@@ -116,4 +116,8 @@ public class ItemService {
 
     return detailedInfos;
   }
+
+  public TargetInfo extraProduct(ProductRequest productRequest) {
+
+  }
 }
