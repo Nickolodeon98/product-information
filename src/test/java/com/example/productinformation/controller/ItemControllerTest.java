@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.productinformation.domain.dto.DetailedInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
@@ -43,6 +44,7 @@ class ItemControllerTest {
   Product mockItem;
   List<Product> products;
   List<Recommend> recommends;
+  List<DetailedInfo> detailedInfos;
   Recommend mockRecommend;
   Long itemId;
   String severalIds;
@@ -64,6 +66,9 @@ class ItemControllerTest {
     mockItem = ProductFixture.get(itemId);
     products = new ArrayList<>();
     products.add(mockItem);
+
+    detailedInfos = new ArrayList<>();
+    detailedInfos.add(DetailedInfo.of(mockItem,mockRecommend));
   }
 
   @Nested
@@ -100,7 +105,7 @@ class ItemControllerTest {
     @DisplayName("성공 - 단건")
     void item_search_success() throws Exception {
 
-      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(products, recommends));
+      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(products, detailedInfos));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", String.valueOf(itemId)))
@@ -123,7 +128,7 @@ class ItemControllerTest {
       products.add(product2);
       products.add(product3);
 
-      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(products, recommends));
+      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(products, detailedInfos));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", severalIds))

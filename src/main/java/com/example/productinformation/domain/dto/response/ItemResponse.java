@@ -1,5 +1,6 @@
 package com.example.productinformation.domain.dto.response;
 
+import com.example.productinformation.domain.dto.DetailedInfo;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
 import java.util.List;
@@ -17,12 +18,12 @@ import lombok.Setter;
 public class ItemResponse {
 
   private List<Product> target;
-  private List<Recommend> results;
+  private List<DetailedInfo> results;
 
-  public static ItemResponse of(List<Product> products, List<Recommend> recommends) {
+  public static ItemResponse of(List<Product> products, List<DetailedInfo> detailedInfos) {
     return ItemResponse.builder()
         .target(products)
-        .results(recommends)
+        .results(detailedInfos)
         .build();
   }
 }
