@@ -16,8 +16,8 @@ import lombok.Setter;
 @Getter
 public class ItemResponse {
 
-  private List<ProductInfo> target;
-  private List<DetailedProductInfo> results;
+  private List<ProductInfo> target; // 조회 대상이 되는 상품
+  private List<DetailedProductInfo> results; // 조회 대상 상품의 연관 상품들
 
   public static ItemResponse of(List<ProductInfo> products, List<DetailedProductInfo> detailedProductInfos) {
     return ItemResponse.builder()

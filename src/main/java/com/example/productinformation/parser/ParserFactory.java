@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class ParserFactory {
+public class ParserFactory { // 다양한 종류의 parser 를 담는 클래스
   private final ProductRepository productRepository;
   @Bean
   public ReadLineContext<Product> productReadLineContext() {

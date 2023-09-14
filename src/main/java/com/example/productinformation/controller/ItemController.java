@@ -64,7 +64,6 @@ public class ItemController {
   @GetMapping
   public Response<ItemResponse> searchItems(@RequestParam("id") String itemId) {
 
-    // itemId 를 Long 으로 변환해준다.
     ItemResponse itemResponse = itemService.acquireItem(itemId);
 
     return Response.success(itemResponse);

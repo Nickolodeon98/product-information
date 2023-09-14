@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductInfo {
+public class ProductInfo { // 상품의 기본 정보
 
   @JsonProperty("item_id")
   private Long itemId;

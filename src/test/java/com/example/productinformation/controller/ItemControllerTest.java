@@ -110,8 +110,7 @@ class ItemControllerTest {
       given(itemService.createRecommend(any()))
           .willReturn(RecommendResponse.of(recommends, "파일 등록 완료"));
 
-      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "파일 등록 완료").getMessage());
-
+      // when, then
       mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
           .content(objectMapper.writeValueAsBytes(fileRequest)))
           .andExpect(status().isOk())
@@ -134,6 +133,7 @@ class ItemControllerTest {
       given(itemService.extraProduct(any()))
           .willReturn(ProductInfo.of(mockItem));
 
+      // when, then
       mockMvc.perform(post(extraUrl).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsBytes(productRequest)))
           .andExpect(status().isOk())
@@ -147,10 +147,12 @@ class ItemControllerTest {
     @Test
     @DisplayName("실패")
     void fail_register_product() throws Exception {
+      // given
       given(itemService.extraProduct(any()))
           .willThrow(
               new ItemException(ErrorCode.INVALID_INPUT, ErrorCode.INVALID_INPUT.getMessage()));
 
+      // when, then
       mockMvc.perform(post(extraUrl).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsBytes(any())))
           .andExpect(status().isNotAcceptable())
@@ -174,6 +176,7 @@ class ItemControllerTest {
       given(itemService.relateItems(any(), any()))
           .willReturn(SingleRecommendResponse.of(mockRecommend, "상품 등록 완료"));
 
+      // when, then
       mockMvc.perform(post(extraRecommendUrl).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsBytes(any()))
               .content(objectMapper.writeValueAsBytes(any())))
@@ -189,10 +192,12 @@ class ItemControllerTest {
     @Test
     @DisplayName("실패")
     void fail_register_product() throws Exception {
+      // given
       given(itemService.relateItems(any(), any()))
           .willThrow(
               new ItemException(ErrorCode.INVALID_INPUT, ErrorCode.INVALID_INPUT.getMessage()));
 
+      // when, then
       mockMvc.perform(post(extraRecommendUrl).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsBytes(any()))
               .content(objectMapper.writeValueAsBytes(any())))
@@ -213,11 +218,11 @@ class ItemControllerTest {
     @Test
     @DisplayName("성공 - 단건")
     void item_search_success() throws Exception {
-
+      // given
       given(itemService.acquireItem(String.valueOf(itemId))).willReturn(
           ItemResponse.of(ProductInfo.of(products),
               detailedProductInfos));
-
+      // when, then
       mockMvc.perform(get(acquireUrl)
               .param("id", String.valueOf(itemId)))
           .andExpect(status().isOk())
@@ -239,10 +244,12 @@ class ItemControllerTest {
       products.add(product2);
       products.add(product3);
 
+      // given
       given(itemService.acquireItem(severalIds)).willReturn(
           ItemResponse.of(ProductInfo.of(products),
               detailedProductInfos));
 
+      // when, then
       mockMvc.perform(get(acquireUrl)
               .param("id", severalIds))
           .andExpect(status().isOk())
@@ -263,9 +270,11 @@ class ItemControllerTest {
     @Test
     @DisplayName("성공")
     void success_modify_item() throws Exception {
+      // given
       given(itemService.editProduct(any(), any())).willReturn(
           ProductEditResponse.of(mockItem, "상품 수정 완료"));
 
+      // when, then
       mockMvc.perform(put(editionUrl)
               .param("itemId", String.valueOf(itemId))
               .contentType(MediaType.APPLICATION_JSON)
@@ -282,10 +291,11 @@ class ItemControllerTest {
     @Test
     @DisplayName("실패 - 상품 없음")
     void fail_modify_item() throws Exception {
+      // given
       given(itemService.editProduct(any(), any()))
           .willThrow(new ItemException(ErrorCode.ITEM_NOT_FOUND,
               ErrorCode.ITEM_NOT_FOUND.getMessage()));
-
+      // when, then
       mockMvc.perform(put(editionUrl)
               .param("itemId", String.valueOf(itemId))
               .contentType(MediaType.APPLICATION_JSON)
@@ -305,10 +315,11 @@ class ItemControllerTest {
     @Test
     @DisplayName("성공")
     void success_delete_product() throws Exception {
-
+      // given
       given(itemService.removeProduct(any()))
           .willReturn(ProductDeleteResponse.of(mockItem, "상품 삭제 완료"));
 
+      // when, then
       mockMvc.perform(delete(deletionUrl)
               .param("itemId", String.valueOf(itemId)))
           .andExpect(status().isOk())
@@ -323,10 +334,12 @@ class ItemControllerTest {
     @Test
     @DisplayName("실패 - 삭제하고자 하는 상품 없음")
     void fail_delete_product() throws Exception {
+      // given
       given(itemService.removeProduct(any()))
           .willThrow(new ItemException(ErrorCode.ITEM_NOT_FOUND,
               ErrorCode.ITEM_NOT_FOUND.getMessage()));
 
+      // when, then
       mockMvc.perform(delete(deletionUrl)
               .param("itemId", String.valueOf(itemId)))
           .andExpect(status().isNotFound())

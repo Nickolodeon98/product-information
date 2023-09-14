@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Slf4j
-public class RecommendParser implements Parser<Recommend> {
+public class RecommendParser implements Parser<Recommend> { // 연관 상품을 가공하는 클래스
 
   private final ProductRepository productRepository;
 

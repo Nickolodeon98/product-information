@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SingleRecommendResponse {
+public class SingleRecommendResponse { // 새로운 연관 상품을 등록한 경우 API 응답을 담는 DTO
   private String message;
   @JsonProperty("target_item_id")
   private Long targetItemId;

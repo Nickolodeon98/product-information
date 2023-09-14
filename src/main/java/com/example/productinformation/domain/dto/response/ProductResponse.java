@@ -17,7 +17,7 @@ import lombok.Setter;
 @Builder
 @EqualsAndHashCode
 public class ProductResponse {
-  private List<Long> productIds;
+  private List<Long> productIds; // csv 파일로부터 읽어서 저장한 상품들의 아이디들
   private String message;
   public static ProductResponse of(List<Product> products, String message) {
     List<Long> ids = new ArrayList<>();

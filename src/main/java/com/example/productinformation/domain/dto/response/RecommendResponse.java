@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RecommendResponse {
-  List<Long> recommendIds;
+  List<Long> recommendIds; // csv 파일로부터 읽어서 저장한 연관 상품들의 아이디들
   String message;
 
   public static RecommendResponse of(List<Recommend> recommends, String message) {

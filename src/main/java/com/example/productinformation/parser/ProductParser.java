@@ -2,7 +2,7 @@ package com.example.productinformation.parser;
 
 import com.example.productinformation.domain.entity.Product;
 
-public class ProductParser implements Parser<Product> {
+public class ProductParser implements Parser<Product> { // 상품 정보를 가공하는 클래스
 
   @Override
   public Product parse(String line) {

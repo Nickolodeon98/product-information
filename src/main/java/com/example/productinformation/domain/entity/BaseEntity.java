@@ -20,7 +20,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Slf4j
-public class BaseEntity {
+public class BaseEntity { // soft delete 가 필요한 엔티티듣에서 상속받을 클래스 (deleted_at 변수를 담음)
 
   @CreatedDate
   @Column(updatable=false)

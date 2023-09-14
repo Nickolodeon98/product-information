@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
 @Slf4j
-public class ItemAppException {
+public class ItemAppException { // 커스텀 에러
 
   @ResponseBody
   @ExceptionHandler(ItemException.class)

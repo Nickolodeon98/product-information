@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReadLineContext<T> {
+public class ReadLineContext<T> { // csv 파일을 읽는 제너릭 클래스
 
   private Parser<T> parser;
   private List<T> lines;

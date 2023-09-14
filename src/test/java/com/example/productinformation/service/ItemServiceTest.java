@@ -119,11 +119,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("성공 - 상품")
     void success_create_product() throws IOException {
+      // given
       when(productReadLineContext.readLines("filename")).thenReturn(products);
       when(productRepository.saveAll(any())).thenReturn(products);
 
+      // when
       ProductResponse response = itemService.createProduct(fileRequest);
 
+      // then
       Assertions.assertEquals(products.get(0).getId(), response.getProductIds().get(0));
 
       verify(productRepository).saveAll(any());
@@ -132,11 +135,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("성공 - 연관 상품")
     void success_add_product() throws IOException {
+      // given
       when(recommendReadLineContext.readLines("filename")).thenReturn(recommends);
       when(recommendRepository.saveAll(any())).thenReturn(recommends);
 
+      // when
       RecommendResponse response = itemService.createRecommend(fileRequest);
 
+      // then
       Assertions.assertEquals(recommends.get(0).getId(), response.getRecommendIds().get(0));
 
       verify(recommendRepository).saveAll(any());
@@ -150,11 +156,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("성공")
     void success_create_product() throws IOException {
+      // given
       when(productRepository.findByItemId(itemId)).thenReturn(Optional.empty());
       when(productRepository.save(any())).thenReturn(mockProduct);
 
+      // when
       ProductInfo response = itemService.extraProduct(mockProduct.toRequest());
 
+      // then
       Assertions.assertEquals(mockProduct.getItemId(), response.getItemId());
 
       verify(productRepository).findByItemId(itemId);
@@ -173,11 +182,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("실패 - 이미 존재하는 상품의 고유 아이디")
     void fail_create_product_duplicate_id() {
+      // given
       when(productRepository.findByItemId(itemId)).thenReturn(Optional.of(mockProduct));
 
+      // when
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.extraProduct(mockProduct.toRequest()));
 
+      // then
       Assertions.assertEquals(ErrorCode.DUPLICATE_ITEM, e.getErrorCode());
 
       verify(productRepository).findByItemId(itemId);
@@ -191,6 +203,7 @@ class ItemServiceTest {
     @Test
     @DisplayName("성공 - 연관 상품이 등록된 적이 없는 상품일 때")
     void success_add_recommend() throws IOException {
+      // given
       lenient().when(recommendRepository.findByItemId((mockRecommend.getItemId()))).thenReturn(Optional.empty());
       lenient().when(productRepository.findByItemId(itemId)).thenReturn(Optional.of(mockProduct));
 
@@ -198,8 +211,10 @@ class ItemServiceTest {
       lenient().when(productRepository.save(recommendRequest.toProductEntity())).thenReturn(recommendRequest.toProductEntity());
       lenient().when(recommendRepository.save(any())).thenReturn(recommendRequest.toEntity(mockProduct));
 
+      // when
       SingleRecommendResponse response = itemService.relateItems(recommendRequest, itemId);
 
+      // then
       Assertions.assertEquals(mockRecommend.getItemId(), response.getRecommendItemId());
       Assertions.assertEquals(mockRecommend.getTarget().getItemId(), response.getTargetItemId());
 
@@ -212,11 +227,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("실패 - 이미 존재하는 연관 상품")
     void fail_create_product_duplicate_id() {
+      // given
       when(recommendRepository.findByItemId(recommendRequest.getItemId())).thenReturn(Optional.of(mockRecommend));
 
+      // when
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.relateItems(recommendRequest, itemId));
 
+      // then
       Assertions.assertEquals(ErrorCode.DUPLICATE_ITEM, e.getErrorCode());
 
       verify(recommendRepository).findByItemId(recommendRequest.getItemId());
@@ -234,11 +252,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("실패 - 존재하지 않는 대상 상품")
     void fail_add_recommend_target_not_found() {
+      // given
       when(productRepository.findByItemId(itemId)).thenReturn(Optional.empty());
 
+      // when
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.relateItems(recommendRequest, itemId));
 
+      // then
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
 
       verify(productRepository).findByItemId(itemId);
@@ -254,13 +275,16 @@ class ItemServiceTest {
     @Test
     @DisplayName("성공 - 단건")
     void success_search_item() {
+      // given
       when(productRepository.findByItemId(any())).thenReturn(Optional.of(mockProduct));
       when(recommendRepository.findAllByTarget(mockProduct)).thenReturn(recommends);
 
       Long id = recommends.get(0).getItemId();
+      // when
       Long secondId = itemService.acquireItem(String.valueOf(itemId)).getResults().get(0)
           .getItemId();
 
+      // then
       Assertions.assertEquals(id, secondId);
 
       verify(productRepository, times(2)).findByItemId(any());
@@ -270,10 +294,12 @@ class ItemServiceTest {
     @Test
     @DisplayName("성공 - 2건 이상")
     void success_search_several_item() {
+      // given
       when(productRepository.findAllByItemIdIn(any())).thenReturn(Optional.of(products));
       when(recommendRepository.findAllByTargetIn(products)).thenReturn(recommends);
       when(productRepository.findByItemId(any())).thenReturn(Optional.of(mockProduct));
 
+      // when, then
       Assertions.assertEquals(recommends.get(0).getItemId(),
           itemService.acquireItem("300373871,300373871").getResults().get(0).getItemId());
 
@@ -285,11 +311,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("실패 - 단건")
     void fail_search_item() {
+      // given
       when(productRepository.findByItemId(any())).thenReturn(Optional.empty());
 
+      // when
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.acquireItem(String.valueOf(itemId)));
 
+      // then
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
 
       verify(productRepository).findByItemId(any());
@@ -298,11 +327,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("실패 - 2건 이상")
     void fail_search_several_item() {
+      // given
       when(productRepository.findAllByItemIdIn(any())).thenReturn(Optional.empty());
 
+      // when
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.acquireItem("300002285,300005968"));
 
+      // then
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
 
       verify(productRepository).findAllByItemIdIn(any());
@@ -316,11 +348,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("성공")
     void success_edit_product() {
+      // given
       when(productRepository.findByItemId(any())).thenReturn(Optional.of(mockProduct));
       when(productRepository.save(any())).thenReturn(editedProduct);
 
+      // when
       ProductEditResponse response = itemService.editProduct(String.valueOf(itemId), productEditRequest);
 
+      // then
       Assertions.assertEquals(editedProduct.getItemId(), response.getEditedItemId());
 
       verify(productRepository).findByItemId(any());
@@ -339,11 +374,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("실패 - 존재하지 않는 대상 상품")
     void fail_edit_product_not_found() {
+      // given
       when(productRepository.findByItemId(any())).thenReturn(Optional.empty());
 
+      // when
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.editProduct(String.valueOf(itemId), ProductEditRequest.of(editedProduct)));
 
+      // then
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
 
       verify(productRepository).findByItemId(any());
@@ -356,11 +394,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("실패 - 삭제할 상품 없음")
     void fail_remove_product_not_found() {
+      // given
       when(productRepository.findByItemId(itemId)).thenReturn(Optional.empty());
 
+      // when
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.removeProduct(String.valueOf(itemId)));
 
+      // then
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
 
       verify(productRepository).findByItemId(itemId);
