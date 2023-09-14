@@ -57,6 +57,9 @@ class ItemControllerTest {
   final String acquireUrl = "/rec";
   final String extraUrl = "/rec/items/extra";
   final String extraRecommendUrl = "/rec/items/chain";
+
+  final String editionUrl = "/rec/items/update";
+
   @BeforeEach
   void setUp() {
     fileRequest = FileRequest.builder()
@@ -75,7 +78,7 @@ class ItemControllerTest {
     products.add(mockItem);
 
     detailedProductInfos = new ArrayList<>();
-    detailedProductInfos.add(DetailedProductInfo.of(mockItem,mockRecommend));
+    detailedProductInfos.add(DetailedProductInfo.of(mockItem, mockRecommend));
   }
 
 //  @Nested
@@ -129,10 +132,11 @@ class ItemControllerTest {
     @DisplayName("실패")
     void fail_register_product() throws Exception {
       given(itemService.extraProduct(any()))
-          .willThrow(new ItemException(ErrorCode.INVALID_INPUT, ErrorCode.INVALID_INPUT.getMessage()));
+          .willThrow(
+              new ItemException(ErrorCode.INVALID_INPUT, ErrorCode.INVALID_INPUT.getMessage()));
 
       mockMvc.perform(post(extraUrl).contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsBytes(any())))
+              .content(objectMapper.writeValueAsBytes(any())))
           .andExpect(status().isNotAcceptable())
           .andExpect(jsonPath("$.resultCode").value("ERROR"))
           .andExpect(jsonPath("$.result.errorCode").value(ErrorCode.INVALID_INPUT.name()))
@@ -170,7 +174,8 @@ class ItemControllerTest {
     @DisplayName("실패")
     void fail_register_product() throws Exception {
       given(itemService.relateItems(any(), any()))
-          .willThrow(new ItemException(ErrorCode.INVALID_INPUT, ErrorCode.INVALID_INPUT.getMessage()));
+          .willThrow(
+              new ItemException(ErrorCode.INVALID_INPUT, ErrorCode.INVALID_INPUT.getMessage()));
 
       mockMvc.perform(post(extraRecommendUrl).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsBytes(any()))
@@ -193,8 +198,9 @@ class ItemControllerTest {
     @DisplayName("성공 - 단건")
     void item_search_success() throws Exception {
 
-      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(ProductInfo.of(products),
-          detailedProductInfos));
+      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(
+          ItemResponse.of(ProductInfo.of(products),
+              detailedProductInfos));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", String.valueOf(itemId)))
@@ -217,8 +223,9 @@ class ItemControllerTest {
       products.add(product2);
       products.add(product3);
 
-      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(ProductInfo.of(products),
-          detailedProductInfos));
+      given(itemService.acquireItem(severalIds)).willReturn(
+          ItemResponse.of(ProductInfo.of(products),
+              detailedProductInfos));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", severalIds))
@@ -231,6 +238,46 @@ class ItemControllerTest {
       verify(itemService).acquireItem(severalIds);
     }
 
+  }
+
+  @Nested
+  @DisplayName("상품 정보 수정")
+  class ItemModification {
+
+    @Test
+    @DisplayName("성공")
+    void success_modify_item() {
+      given(itemService.editProduct(any())).willReturn(ProductEditResponse.of(mockItem, "수정 완료"));
+
+      mockMvc.perform(put(editionUrl)
+              .param("itemId", String.valueOf(itemId))
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsBytes(productRequest)))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+          .andExpect(jsonPath("$.result.message").value("수정 완료"))
+          .andExpect(jsonPath("$.result.itemId").value(productRequest.getItemId()))
+          .andDo(print());
+
+      verify(itemService).editProduct(any());
+    }
+
+    @Test
+    @DisplayName("실패 - 상품 없음")
+    void fail_modify_item() {
+      given(itemService.editProduct(any()))
+          .willThrow(new ItemException(ErrorCode.ITEM_NOT_FOUND,
+              ErrorCode.ITEM_NOT_FOUND.getMessage()));
+
+      mockMvc.perform(put(editionUrl)
+              .param("itemId", String.valueOf(itemId))
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsBytes(productRequest)))
+          .andExpect(status().isNotFound())
+          .andExpect(jsonPath("$.result.errorCode").value(ErrorCode.ITEM_NOT_FOUND.name()))
+          .andExpect(jsonPath("$.result.message").value(ErrorCode.ITEM_NOT_FOUND.getMessage()))
+          .andDo(print());
+    }
   }
 
 }
