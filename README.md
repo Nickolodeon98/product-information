@@ -49,9 +49,9 @@ SPRING_DATASOURCE_PASSWORD=Ingod2013!;SPRING_DATASOURCE_URL=jdbc:mysql://ec2-13-
 
 #### 1. "[사용자] 상품 등록 API"
 
--설명:
--입력:
--출력:
+- 설명:
+- 입력:
+- 출력:
 
 #### 2. "[사용자] 연관 상품 등록 API"
 
