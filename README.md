@@ -49,6 +49,8 @@ SPRING_DATASOURCE_PASSWORD=Ingod2013!;SPRING_DATASOURCE_URL=jdbc:mysql://ec2-13-
 
 ### 사용 가이드 - 상품 등록, 수정, 삭제에 대한 설명
 
+- 임의로 [사용자] 는 일반 사용자가 사용할 API, [관리자] 는 관리자가 사용할 API 로 구분했습니다.
+
 #### 1. [사용자] 상품 등록
 
 - 엔드포인트: ``POST /rec/items/extra``
@@ -62,13 +64,13 @@ SPRING_DATASOURCE_PASSWORD=Ingod2013!;SPRING_DATASOURCE_URL=jdbc:mysql://ec2-13-
 - 설명: 상품 정보를 입력하면 이미 있는 상품일 경우 새롭게 추가하지 않고, 기존에 없는 상품일 경우 새롭게 추가해서 연관된 상품의 정보와 함께 저장합니다.
 - 입력: 상품 등록의 입력과 동일 + ``Long target_item_id : 연관 상품 고유 아이디``, ``Integer rank : 연관도 순위``, ``Integer score : 연관도 점수``
 
-#### 3. [사용자] 상품 수정
+#### 3. [관리자] 상품 수정
 
 - 엔드포인트: ``PUT /rec/items/update``
 - 설명: 수정 시 아이디를 제외한 상품 정보와 함께 수정할 상품의 고유 아이디를 입력하면 수정 가능합니다.
 - 입력: ``Long item_id : 수정할 상품 고유 아이디``, 상품 등록의 입력과 동일 (단, ``Long item_id`` 는 제외)
 
-#### 4. [사용자] 상품 삭제
+#### 4. [관리자] 상품 삭제
 
 - 엔드포인트: ``DELETE /rec/items/removal``
 - 설명: Soft Delete 로 구현하였습니다. 삭제 요청 시 상품의 컬럼에 있는 ``deleted_at`` 값이 현재 시간으로 채워집니다. 
