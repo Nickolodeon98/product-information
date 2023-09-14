@@ -65,7 +65,7 @@ class ItemControllerTest {
   final String extraRecommendUrl = "/rec/items/chain";
 
   final String editionUrl = "/rec/items/update";
-  final String deletionUrl = "/rec/items/removal"
+  final String deletionUrl = "/rec/items/removal";
 
   @BeforeEach
   void setUp() {
@@ -314,7 +314,7 @@ class ItemControllerTest {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
           .andExpect(jsonPath("$.result.message").value("상품 삭제 완료"))
-          .andExpect(jsonPath("$.result.deleted_item_id").value(mockItem))
+          .andExpect(jsonPath("$.result.deleted_item_id").value(mockItem.getItemId()))
           .andDo(print());
 
       verify(itemService).removeProduct(any());

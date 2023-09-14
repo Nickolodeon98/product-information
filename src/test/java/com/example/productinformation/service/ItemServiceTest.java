@@ -359,12 +359,14 @@ class ItemServiceTest {
     @Test
     @DisplayName("실패 - 삭제할 상품 없음")
     void fail_remove_product_not_found() {
-      when(productRepository.findById(itemId)).thenReturn(Optional.empty());
+      when(productRepository.findByItemId(itemId)).thenReturn(Optional.empty());
 
       ItemException e = Assertions.assertThrows(ItemException.class,
-          () -> itemService.removeProduct(itemId));
+          () -> itemService.removeProduct(String.valueOf(itemId)));
 
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+
+      verify(productRepository).findByItemId(itemId);
     }
 
     @Test

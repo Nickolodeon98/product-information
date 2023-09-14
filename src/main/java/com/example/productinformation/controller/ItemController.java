@@ -5,6 +5,7 @@ import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.request.ProductEditRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
+import com.example.productinformation.domain.dto.response.ProductDeleteResponse;
 import com.example.productinformation.domain.dto.response.ProductEditResponse;
 import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.Response;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -93,10 +95,18 @@ public class ItemController {
   @ResponseBody
   @Operation(summary = "[관리자] 상품 수정", description = "입력된 상품 아이디로 찾은 상품의 정보를 수정한다.")
   @PutMapping("/items/update")
-  public Response<ProductEditResponse> modifyRecommend(@RequestParam("itemId") String itemId, @RequestBody(required = false) ProductEditRequest productEditRequest) {
+  public Response<ProductEditResponse> modifyProduct(@RequestParam("itemId") String itemId, @RequestBody(required = false) ProductEditRequest productEditRequest) {
     ProductEditResponse response = itemService.editProduct(itemId, productEditRequest);
 
     return Response.success(response);
   }
 
+  @ResponseBody
+  @Operation(summary = "[관리자] 상품 삭제", description = "입력된 상품 아이디로 찾은 상품을 삭제한다.")
+  @DeleteMapping("/items/removal")
+  public Response<ProductDeleteResponse> deleteProduct(@RequestParam("itemId") String itemId) {
+    ProductDeleteResponse response = itemService.removeProduct(itemId);
+
+    return Response.success(response);
+  }
 }
