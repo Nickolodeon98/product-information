@@ -35,7 +35,7 @@ public class DetailedProductInfo {
 
   public static DetailedProductInfo of(Product productInfo, Recommend recommend) {
     return DetailedProductInfo.builder()
-        .itemId(recommend.getItemId())
+        .itemId(recommend.getItemId() == null ? null : recommend.getItemId())
         .itemName(productInfo.getItemName() == null ? null : productInfo.getItemName())
         .itemImage(productInfo.getItemImage() == null ? null : productInfo.getItemImage())
         .itemUrl(productInfo.getItemUrl() == null ? null : productInfo.getItemUrl())
@@ -43,6 +43,26 @@ public class DetailedProductInfo {
         .salePrice(productInfo.getSalePrice() == null ? null : productInfo.getSalePrice())
         .score(recommend.getScore())
         .rank(recommend.getRanking())
+        .build();
+  }
+
+  public Product toProductEntity() {
+    return Product.builder()
+        .itemId(this.itemId)
+        .itemName(this.itemName)
+        .itemImage(this.itemImage)
+        .itemUrl(this.itemUrl)
+        .originalPrice(this.originalPrice)
+        .salePrice(this.salePrice)
+        .build();
+  }
+
+  public Recommend toEntity(Product product) {
+    return Recommend.builder()
+        .itemId(this.itemId)
+        .target(product)
+        .score(this.score)
+        .ranking(this.rank)
         .build();
   }
 }

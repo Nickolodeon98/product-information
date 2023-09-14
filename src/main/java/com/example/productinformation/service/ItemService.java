@@ -142,4 +142,31 @@ public class ItemService {
 
     return ProductInfo.of(savedProduct);
   }
+
+  public SingleRecommendResponse relateItems(DetailedProductInfo recommendRequest, Long targetItemId) {
+
+    Optional<Recommend> recommend = recommendRepository.findByItemId(recommendRequest.getItemId());
+    
+    // 이미 연관 상품을 등록한 적이 있다면
+    if (recommend.isPresent()) {
+      throw new ItemException(ErrorCode.DUPLICATE_ITEM,
+          ErrorCode.DUPLICATE_ITEM.getMessage());
+    }
+
+    Product product = productRepository.findByItemId(targetItemId)
+        .orElseThrow(()->{
+          throw new ItemException(ErrorCode.ITEM_NOT_FOUND,
+              ErrorCode.ITEM_NOT_FOUND.getMessage());
+        });
+
+    Optional<Product> recommendedItem = productRepository.findByItemId(recommendRequest.getItemId());
+
+    if (recommendedItem.isEmpty()) {
+      productRepository.save(recommendRequest.toProductEntity());
+    }
+
+    Recommend recommendEntity = recommendRepository.save(recommendRequest.toEntity(product));
+
+    return SingleRecommendResponse.of(recommendEntity);
+  }
 }
