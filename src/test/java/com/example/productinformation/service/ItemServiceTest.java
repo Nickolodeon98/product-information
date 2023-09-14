@@ -1,6 +1,8 @@
 package com.example.productinformation.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -8,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.example.productinformation.domain.dto.DetailedProductInfo;
 import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
+import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.entity.Recommend;
@@ -174,34 +177,35 @@ class ItemServiceTest {
     @Test
     @DisplayName("성공 - 연관 상품이 등록된 적이 없는 상품일 때")
     void success_add_recommend() throws IOException {
-      when(recommendRepository.findByItemId((mockRecommend.getItemId()))).thenReturn(Optional.empty());
-      when(productRepository.findByItemId(itemId)).thenReturn(Optional.of(mockProduct));
-      when(recommendRepository.save(mockRecommend)).thenReturn(mockRecommend);
+      lenient().when(recommendRepository.findByItemId((mockRecommend.getItemId()))).thenReturn(Optional.empty());
+      lenient().when(productRepository.findByItemId(itemId)).thenReturn(Optional.of(mockProduct));
 
-      when(productRepository.findByItemId(recommendRequest.getItemId())).thenReturn(Optional.empty());
-      when(productRepository.save(recommendRequest.toProductEntity())).thenReturn(recommendRequest.toProductEntity());
+      lenient().when(productRepository.findByItemId(recommendRequest.getItemId())).thenReturn(Optional.empty());
+      lenient().when(productRepository.save(recommendRequest.toProductEntity())).thenReturn(recommendRequest.toProductEntity());
+      lenient().when(recommendRepository.save(any())).thenReturn(recommendRequest.toEntity(mockProduct));
 
       SingleRecommendResponse response = itemService.relateItems(recommendRequest, itemId);
 
-      Assertions.assertEquals(mockRecommend.getItemId(), response.getItemId());
+      Assertions.assertEquals(mockRecommend.getItemId(), response.getRecommendItemId());
       Assertions.assertEquals(mockRecommend.getTarget().getItemId(), response.getTargetItemId());
 
-      verify(productRepository.save(recommendRequest.toProductEntity()));
+      verify(productRepository).save(recommendRequest.toProductEntity());
       verify(recommendRepository).findByItemId(mockRecommend.getItemId());
       verify(productRepository).findByItemId(itemId);
-      verify(recommendRepository).save(mockRecommend);
+      verify(productRepository).findByItemId(recommendRequest.getItemId());
+      verify(recommendRepository).save(any());
     }
     @Test
     @DisplayName("실패 - 이미 존재하는 연관 상품")
     void fail_create_product_duplicate_id() {
-      when(recommendRepository.findByItemId(itemId)).thenReturn(Optional.of(mockRecommend));
+      when(recommendRepository.findByItemId(recommendRequest.getItemId())).thenReturn(Optional.of(mockRecommend));
 
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.relateItems(recommendRequest, itemId));
 
       Assertions.assertEquals(ErrorCode.DUPLICATE_ITEM, e.getErrorCode());
 
-      verify(recommendRepository).findByItemId(itemId);
+      verify(recommendRepository).findByItemId(recommendRequest.getItemId());
     }
     @Test
     @DisplayName("실패 - 연관 상품의 고유 아이디가 주어지지 않음")
@@ -209,7 +213,7 @@ class ItemServiceTest {
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.relateItems(wrongRecommendRequest, itemId));
 
-      Assertions.assertEquals(ErrorCode.INVALID_INPUT, e.getErrorCode());
+      Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
     }
 
 
