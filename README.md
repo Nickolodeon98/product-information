@@ -49,7 +49,7 @@ SPRING_DATASOURCE_PASSWORD=Ingod2013!;SPRING_DATASOURCE_URL=jdbc:mysql://ec2-13-
 
 ### 사용 가이드 - 상품 등록, 수정, 삭제에 대한 설명
 
-- 임의로 [사용자] 는 일반 사용자가 사용할 API, [관리자] 는 관리자가 사용할 API 로 구분했습니다.
+_임의로 [사용자] 는 일반 사용자가 사용할 API, [관리자] 는 관리자가 사용할 API 로 구분했습니다._
 
 #### 1. [사용자] 상품 등록
 
