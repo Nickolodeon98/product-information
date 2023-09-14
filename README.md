@@ -17,8 +17,9 @@ _product.csv, rec.csv 두 파일을 활용해 상품 정보를 생성, 조회, �
 - DB: ``MySQL``
 - CLOUD: ``AWS EC2``
 
-### Swagger API 실행 방법
 <hr>
+
+### Swagger API 실행 방법
 
 #### MySQL DB를 AWS EC2 서버에 올려 사용했습니다. 다음과 같이 설정 후 빌드하시면 됩니다.
 1. 실행 환경변수를 설정하기 위해 아래의 화면에서 Edit에 들어갑니다. 
