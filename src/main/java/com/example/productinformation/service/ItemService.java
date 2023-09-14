@@ -177,15 +177,19 @@ public class ItemService {
     return SingleRecommendResponse.of(recommendEntity, "등록 완료");
   }
 
-  public ProductEditResponse editProduct(Long itemId, ProductEditRequest request) {
+  public ProductEditResponse editProduct(String itemId, ProductEditRequest request) {
+    itemId = itemId.trim();
 
-    productRepository.findByItemId(itemId)
+    if (itemId.length() == 0 || itemId.contains("[^0-9]")) throw new ItemException(ErrorCode.INVALID_INPUT,
+        ErrorCode.INVALID_INPUT.getMessage());
+
+    Product product = productRepository.findByItemId(Long.valueOf(itemId))
         .orElseThrow(() -> {
           throw new ItemException(ErrorCode.ITEM_NOT_FOUND,
               ErrorCode.ITEM_NOT_FOUND.getMessage());
         });
 
-    Product editedProduct = productRepository.save(request.toEntity(itemId));
+    Product editedProduct = productRepository.save(request.toEntity(product.getId(), Long.valueOf(itemId)));
 
     return ProductEditResponse.of(editedProduct, "수정 완료");
   }

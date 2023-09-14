@@ -321,7 +321,7 @@ class ItemServiceTest {
       when(productRepository.findByItemId(any())).thenReturn(Optional.of(mockProduct));
       when(productRepository.save(any())).thenReturn(editedProduct);
 
-      ProductEditResponse response = itemService.editProduct(itemId, productEditRequest);
+      ProductEditResponse response = itemService.editProduct(String.valueOf(itemId), productEditRequest);
 
       Assertions.assertEquals(editedProduct.getItemId(), response.getEditedItemId());
 
@@ -330,12 +330,12 @@ class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("실패 - 상품의 고유 아이디가 주어지지 않음")
+    @DisplayName("실패 - 상품의 입력이 올바르게 주어지지 않음")
     void fail_add_recommend_id_not_found() throws IOException {
       ItemException e = Assertions.assertThrows(ItemException.class,
-          () -> itemService.editProduct(null, ProductEditRequest.of(editedProduct)));
+          () -> itemService.editProduct(" ", ProductEditRequest.of(editedProduct)));
 
-      Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+      Assertions.assertEquals(ErrorCode.INVALID_INPUT, e.getErrorCode());
     }
 
     @Test
@@ -344,7 +344,7 @@ class ItemServiceTest {
       when(productRepository.findByItemId(any())).thenReturn(Optional.empty());
 
       ItemException e = Assertions.assertThrows(ItemException.class,
-          () -> itemService.editProduct(itemId, ProductEditRequest.of(editedProduct)));
+          () -> itemService.editProduct(String.valueOf(itemId), ProductEditRequest.of(editedProduct)));
 
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
 

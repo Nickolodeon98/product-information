@@ -58,7 +58,7 @@ public class ItemController {
   }
 
   @ResponseBody
-  @Operation(summary = "상품 조회", description = "상품 정보 및 연관 상품에 대해 조회할 수 있다.")
+  @Operation(summary = "[관리자, 사용자] 상품 조회", description = "상품 정보 및 연관 상품에 대해 조회할 수 있다.")
   @GetMapping
   public Response<ItemResponse> searchItems(@RequestParam("id") String itemId) {
 
@@ -91,9 +91,10 @@ public class ItemController {
   }
 
   @ResponseBody
+  @Operation(summary = "[관리자] 상품 수정", description = "입력된 상품 아이디로 찾은 상품의 정보를 수정한다.")
   @PutMapping("/items/update")
-  public Response<ProductEditResponse> modifyRecommend(@RequestParam("itemId") String itemId, ProductEditRequest productEditRequest) {
-    ProductEditResponse response = itemService.editProduct(Long.valueOf(itemId), productEditRequest);
+  public Response<ProductEditResponse> modifyRecommend(@RequestParam("itemId") String itemId, @RequestBody(required = false) ProductEditRequest productEditRequest) {
+    ProductEditResponse response = itemService.editProduct(itemId, productEditRequest);
 
     return Response.success(response);
   }

@@ -37,8 +37,9 @@ public class ProductEditRequest {
         .build();
   }
 
-  public Product toEntity(Long itemId) {
+  public Product toEntity(Long id, Long itemId) {
     return Product.builder()
+        .id(id)
         .itemId(itemId)
         .itemName(this.itemName)
         .itemImage(this.itemImage)
