@@ -301,7 +301,6 @@ class ItemControllerTest {
   @Nested
   @DisplayName("상품 삭제")
   class ItemRemoval {
-
     @Test
     @DisplayName("성공")
     void success_delete_product() throws Exception {
@@ -321,7 +320,7 @@ class ItemControllerTest {
     }
 
     @Test
-    @DisplayName("실패")
+    @DisplayName("실패 - 삭제하고자 하는 상품 없음")
     void fail_delete_product() throws Exception {
       given(itemService.removeProduct(any()))
           .willThrow(new ItemException(ErrorCode.ITEM_NOT_FOUND,
