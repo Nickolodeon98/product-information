@@ -23,6 +23,7 @@ _product.csv, rec.csv 두 파일을 활용해 상품 정보를 생성, 조회, �
 
 #### MySQL DB를 AWS EC2 서버에 올려 사용했습니다. 다음과 같이 설정 후 빌드하시면 됩니다.
 1. 실행 환경변수를 설정하기 위해 아래의 화면에서 Edit에 들어갑니다. 
+
 ![img_1.png](images/img_1.png)
 
 2. 아래와 같은 화면을 볼 수 있습니다. Environment variables 칸에 아래 문자열을 입력합니다:
@@ -32,6 +33,7 @@ SPRING_DATASOURCE_PASSWORD=Ingod2013!;SPRING_DATASOURCE_URL=jdbc:mysql://ec2-13-
 ![img_3.png](images/img_3.png)
 
 3. run 을 클릭하여 실행합니다.
+
 ![img_5.png](images/img_5.png)
 
 4. 실행이 되면 브라우저에 접속합니다.
@@ -40,4 +42,5 @@ SPRING_DATASOURCE_PASSWORD=Ingod2013!;SPRING_DATASOURCE_URL=jdbc:mysql://ec2-13-
 ``http://localhost:8080/swagger-ui/``
 
 6. 아래와 같은 화면을 볼 수 있습니다. 
+
 ![img_6.png](images/img_6.png)
