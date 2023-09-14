@@ -8,4 +8,10 @@ public class ProductFixture {
         .itemImage("//image.wconcept.co.kr/productimg/image/img2/85/300002285.jpg")
         .itemUrl("m.wconcept.co.kr/product/300002285").originalPrice(5900).salePrice(5900).build();
   }
+
+  public static Product getWrong() {
+    return Product.builder().id(1L).itemName("아비루즈 ha-15")
+        .itemImage("//image.wconcept.co.kr/productimg/image/img2/85/300002285.jpg")
+        .itemUrl("m.wconcept.co.kr/product/300002285").originalPrice(5900).salePrice(5900).build();
+  }
 }

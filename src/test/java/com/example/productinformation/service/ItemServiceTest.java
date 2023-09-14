@@ -1,14 +1,18 @@
 package com.example.productinformation.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.productinformation.domain.dto.DetailedProductInfo;
+import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
+import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.dto.request.FileRequest;
-import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.entity.Recommend;
 import com.example.productinformation.exception.ErrorCode;
 import com.example.productinformation.exception.ItemException;
@@ -21,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.text.html.Option;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,10 +61,15 @@ class ItemServiceTest {
   String sampleLine3;
   Product mockProduct;
   Recommend mockRecommend;
+
   List<Product> products;
   List<Recommend> recommends;
   FileRequest fileRequest;
   Long itemId;
+  Product wrongProduct;
+  Recommend wrongRecommend;
+  DetailedProductInfo recommendRequest;
+  private DetailedProductInfo wrongRecommendRequest;
 
   @BeforeEach
   void setUp() {
@@ -78,41 +88,147 @@ class ItemServiceTest {
     recommends = new ArrayList<>();
     recommends.add(mockRecommend);
     fileRequest = FileRequest.builder().filename("filename").build();
+
+    wrongProduct = ProductFixture.getWrong();
+    wrongRecommend = RecommendFixture.getWrong(itemId);
+    recommendRequest = DetailedProductInfo.of(mockProduct, mockRecommend);
+    wrongRecommendRequest = DetailedProductInfo.of(wrongProduct, wrongRecommend);
   }
 
+  //  @Nested
+//  @DisplayName("상품 등록")
+//  class ProductCreation {
+//    @Test
+//    @DisplayName("성공")
+//    void success_create_product() throws IOException {
+//      when(productReadLineContext.readLines("filename")).thenReturn(products);
+//      when(productRepository.saveAll(any())).thenReturn(products);
+//
+//      ProductResponse response = itemService.createProduct(fileRequest);
+//
+//      Assertions.assertEquals(products.get(0).getId(), response.getProductIds().get(0));
+//
+//      verify(productRepository).saveAll(any());
+//    }
+//  }
   @Nested
   @DisplayName("상품 등록")
   class ProductCreation {
+
     @Test
     @DisplayName("성공")
     void success_create_product() throws IOException {
-      when(productReadLineContext.readLines("filename")).thenReturn(products);
-      when(productRepository.saveAll(any())).thenReturn(products);
+      when(productRepository.findByItemId(itemId)).thenReturn(Optional.empty());
+      when(productRepository.save(any())).thenReturn(mockProduct);
 
-      ProductResponse response = itemService.createProduct(fileRequest);
+      ProductInfo response = itemService.extraProduct(mockProduct.toRequest());
 
-      Assertions.assertEquals(products.get(0).getId(), response.getProductIds().get(0));
+      Assertions.assertEquals(mockProduct.getItemId(), response.getItemId());
 
-      verify(productRepository).saveAll(any());
+      verify(productRepository).findByItemId(itemId);
+      verify(productRepository).save(any());
+    }
+
+    @Test
+    @DisplayName("실패 - 상품의 고유 아이디가 주어지지 않음")
+    void fail_create_product_no_id() {
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.extraProduct(wrongProduct.toRequest()));
+
+      Assertions.assertEquals(ErrorCode.INVALID_INPUT, e.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("실패 - 이미 존재하는 상품의 고유 아이디")
+    void fail_create_product_duplicate_id() {
+      when(productRepository.findByItemId(itemId)).thenReturn(Optional.of(mockProduct));
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.extraProduct(mockProduct.toRequest()));
+
+      Assertions.assertEquals(ErrorCode.DUPLICATE_ITEM, e.getErrorCode());
+
+      verify(productRepository).findByItemId(itemId);
     }
   }
 
+//  @Nested
+//  @DisplayName("연관 상품 등록")
+//  class ProductRegistration {
+//
+//    @Test
+//    @DisplayName("성공")
+//    void success_add_product() throws IOException {
+//      when(recommendReadLineContext.readLines("filename")).thenReturn(recommends);
+//      when(recommendRepository.saveAll(any())).thenReturn(recommends);
+//
+//      RecommendResponse response = itemService.createRecommend(fileRequest);
+//
+//      Assertions.assertEquals(recommends.get(0).getId(), response.getRecommendIds().get(0));
+//
+//      verify(recommendRepository).saveAll(any());
+//    }
+//  }
+
   @Nested
   @DisplayName("연관 상품 등록")
-  class ProductRegistration {
+  class RecommendRegistration {
 
     @Test
-    @DisplayName("성공")
-    void success_add_product() throws IOException {
-      when(recommendReadLineContext.readLines("filename")).thenReturn(recommends);
-      when(recommendRepository.saveAll(any())).thenReturn(recommends);
+    @DisplayName("성공 - 연관 상품이 등록된 적이 없는 상품일 때")
+    void success_add_recommend() throws IOException {
+      lenient().when(recommendRepository.findByItemId((mockRecommend.getItemId()))).thenReturn(Optional.empty());
+      lenient().when(productRepository.findByItemId(itemId)).thenReturn(Optional.of(mockProduct));
 
-      RecommendResponse response = itemService.createRecommend(fileRequest);
+      lenient().when(productRepository.findByItemId(recommendRequest.getItemId())).thenReturn(Optional.empty());
+      lenient().when(productRepository.save(recommendRequest.toProductEntity())).thenReturn(recommendRequest.toProductEntity());
+      lenient().when(recommendRepository.save(any())).thenReturn(recommendRequest.toEntity(mockProduct));
 
-      Assertions.assertEquals(recommends.get(0).getId(), response.getRecommendIds().get(0));
+      SingleRecommendResponse response = itemService.relateItems(recommendRequest, itemId);
 
-      verify(recommendRepository).saveAll(any());
+      Assertions.assertEquals(mockRecommend.getItemId(), response.getRecommendItemId());
+      Assertions.assertEquals(mockRecommend.getTarget().getItemId(), response.getTargetItemId());
+
+      verify(productRepository).save(recommendRequest.toProductEntity());
+      verify(recommendRepository).findByItemId(mockRecommend.getItemId());
+      verify(productRepository).findByItemId(itemId);
+      verify(productRepository).findByItemId(recommendRequest.getItemId());
+      verify(recommendRepository).save(any());
     }
+    @Test
+    @DisplayName("실패 - 이미 존재하는 연관 상품")
+    void fail_create_product_duplicate_id() {
+      when(recommendRepository.findByItemId(recommendRequest.getItemId())).thenReturn(Optional.of(mockRecommend));
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.relateItems(recommendRequest, itemId));
+
+      Assertions.assertEquals(ErrorCode.DUPLICATE_ITEM, e.getErrorCode());
+
+      verify(recommendRepository).findByItemId(recommendRequest.getItemId());
+    }
+    @Test
+    @DisplayName("실패 - 연관 상품의 고유 아이디가 주어지지 않음")
+    void fail_add_recommend_id_not_found() throws IOException {
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.relateItems(wrongRecommendRequest, itemId));
+
+      Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+    }
+
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 대상 상품")
+    void fail_add_recommend_target_not_found() {
+      when(productRepository.findByItemId(itemId)).thenReturn(Optional.empty());
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.relateItems(recommendRequest, itemId));
+
+      Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+    }
+
+
   }
 
   @Nested
@@ -131,7 +247,7 @@ class ItemServiceTest {
 
       Assertions.assertEquals(id, secondId);
 
-      verify(productRepository,times(2)).findByItemId(any());
+      verify(productRepository, times(2)).findByItemId(any());
       verify(recommendRepository).findAllByTarget(mockProduct);
     }
 

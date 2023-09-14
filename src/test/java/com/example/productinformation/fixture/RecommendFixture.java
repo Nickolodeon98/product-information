@@ -16,4 +16,15 @@ public class RecommendFixture {
         .ranking(1)
         .build();
   }
+
+  public static Recommend getWrong(Long itemId) {
+    Product product = ProductFixture.get(itemId);
+
+    return Recommend.builder()
+        .target(product)
+        .id(1L)
+        .score(20)
+        .ranking(1)
+        .build();
+  }
 }

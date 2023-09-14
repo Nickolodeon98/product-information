@@ -1,5 +1,6 @@
 package com.example.productinformation.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -7,13 +8,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.productinformation.domain.dto.DetailedInfo;
-import com.example.productinformation.domain.dto.TargetInfo;
+import com.example.productinformation.domain.dto.DetailedProductInfo;
+import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
-import com.example.productinformation.domain.dto.response.RecommendResponse;
+import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
+import com.example.productinformation.exception.ErrorCode;
+import com.example.productinformation.exception.ItemException;
 import com.example.productinformation.fixture.ProductFixture;
 import com.example.productinformation.fixture.RecommendFixture;
 import com.example.productinformation.service.ItemService;
@@ -42,15 +45,18 @@ class ItemControllerTest {
   @Autowired
   ObjectMapper objectMapper;
   FileRequest fileRequest;
+  ProductInfo productRequest;
   Product mockItem;
   List<Product> products;
   List<Recommend> recommends;
-  List<DetailedInfo> detailedInfos;
+  List<DetailedProductInfo> detailedProductInfos;
   Recommend mockRecommend;
   Long itemId;
   String severalIds;
   final String url = "/rec/items/relevance";
   final String acquireUrl = "/rec";
+  final String extraUrl = "/rec/items/extra";
+  final String extraRecommendUrl = "/rec/items/chain";
   @BeforeEach
   void setUp() {
     fileRequest = FileRequest.builder()
@@ -68,8 +74,73 @@ class ItemControllerTest {
     products = new ArrayList<>();
     products.add(mockItem);
 
-    detailedInfos = new ArrayList<>();
-    detailedInfos.add(DetailedInfo.of(mockItem,mockRecommend));
+    detailedProductInfos = new ArrayList<>();
+    detailedProductInfos.add(DetailedProductInfo.of(mockItem,mockRecommend));
+  }
+
+//  @Nested
+//  @DisplayName("연관 상품 등록")
+//  class RecommendRegistration {
+//
+//    @Test
+//    @DisplayName("성공")
+//    void recommend_success() throws Exception {
+//      log.info("recommendsId:{}", recommends.get(0).getId());
+//
+//      // given
+//      given(itemService.createRecommend(fileRequest))
+//          .willReturn(RecommendResponse.of(recommends, "등록 완료"));
+//
+//      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "등록 완료").getMessage());
+//
+//      mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
+//          .content(objectMapper.writeValueAsBytes(fileRequest)))
+//          .andExpect(status().isOk())
+//          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+//          .andExpect(jsonPath("$.result.message").value("등록 완료"))
+//          .andDo(print());
+//
+//      verify(itemService).createRecommend(fileRequest);
+//    }
+//  }
+
+  @Nested
+  @DisplayName("상품 등록")
+  class ProductRegistration {
+
+    @Test
+    @DisplayName("성공")
+    void success_register_product() throws Exception {
+      // given
+      given(itemService.extraProduct(any()))
+          .willReturn(ProductInfo.of(mockItem));
+
+      mockMvc.perform(post(extraUrl).contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsBytes(productRequest)))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+          .andExpect(jsonPath("$.result.itemId").value(itemId))
+          .andDo(print());
+
+      verify(itemService).extraProduct(any());
+    }
+
+    @Test
+    @DisplayName("실패")
+    void fail_register_product() throws Exception {
+      given(itemService.extraProduct(any()))
+          .willThrow(new ItemException(ErrorCode.INVALID_INPUT, ErrorCode.INVALID_INPUT.getMessage()));
+
+      mockMvc.perform(post(extraUrl).contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsBytes(any())))
+          .andExpect(status().isNotAcceptable())
+          .andExpect(jsonPath("$.resultCode").value("ERROR"))
+          .andExpect(jsonPath("$.result.errorCode").value(ErrorCode.INVALID_INPUT.name()))
+          .andExpect(jsonPath("$.result.message").value(ErrorCode.INVALID_INPUT.getMessage()))
+          .andDo(print());
+
+      verify(itemService).extraProduct(any());
+    }
   }
 
   @Nested
@@ -78,23 +149,39 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("성공")
-    void recommend_success() throws Exception {
-      log.info("recommendsId:{}", recommends.get(0).getId());
-
+    void success_register_recommend() throws Exception {
       // given
-      given(itemService.createRecommend(fileRequest))
-          .willReturn(RecommendResponse.of(recommends, "등록 완료"));
+      given(itemService.relateItems(any(), any()))
+          .willReturn(SingleRecommendResponse.of(mockRecommend, "등록 완료"));
 
-      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "등록 완료").getMessage());
-
-      mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsBytes(fileRequest)))
+      mockMvc.perform(post(extraRecommendUrl).contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsBytes(any()))
+              .content(objectMapper.writeValueAsBytes(any())))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+          .andExpect(jsonPath("$.result.target_item_id").value(itemId))
           .andExpect(jsonPath("$.result.message").value("등록 완료"))
           .andDo(print());
 
-      verify(itemService).createRecommend(fileRequest);
+      verify(itemService).relateItems(any(), any());
+    }
+
+    @Test
+    @DisplayName("실패")
+    void fail_register_product() throws Exception {
+      given(itemService.relateItems(any(), any()))
+          .willThrow(new ItemException(ErrorCode.INVALID_INPUT, ErrorCode.INVALID_INPUT.getMessage()));
+
+      mockMvc.perform(post(extraRecommendUrl).contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsBytes(any()))
+              .content(objectMapper.writeValueAsBytes(any())))
+          .andExpect(status().isNotAcceptable())
+          .andExpect(jsonPath("$.resultCode").value("ERROR"))
+          .andExpect(jsonPath("$.result.errorCode").value(ErrorCode.INVALID_INPUT.name()))
+          .andExpect(jsonPath("$.result.message").value(ErrorCode.INVALID_INPUT.getMessage()))
+          .andDo(print());
+
+      verify(itemService).relateItems(any(), any());
     }
   }
 
@@ -106,7 +193,8 @@ class ItemControllerTest {
     @DisplayName("성공 - 단건")
     void item_search_success() throws Exception {
 
-      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(TargetInfo.of(products), detailedInfos));
+      given(itemService.acquireItem(String.valueOf(itemId))).willReturn(ItemResponse.of(ProductInfo.of(products),
+          detailedProductInfos));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", String.valueOf(itemId)))
@@ -129,7 +217,8 @@ class ItemControllerTest {
       products.add(product2);
       products.add(product3);
 
-      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(TargetInfo.of(products), detailedInfos));
+      given(itemService.acquireItem(severalIds)).willReturn(ItemResponse.of(ProductInfo.of(products),
+          detailedProductInfos));
 
       mockMvc.perform(get(acquireUrl)
               .param("id", severalIds))
