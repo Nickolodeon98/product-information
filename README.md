@@ -42,4 +42,5 @@ SPRING_DATASOURCE_PASSWORD=Ingod2013!;SPRING_DATASOURCE_URL=jdbc:mysql://ec2-13-
 
 ### ERD
 <hr>
-![img.png](img.png)
+
+![erd.png](images/erd.png)
