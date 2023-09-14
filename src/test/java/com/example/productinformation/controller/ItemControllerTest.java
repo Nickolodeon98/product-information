@@ -1,7 +1,6 @@
 package com.example.productinformation.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -108,15 +107,15 @@ class ItemControllerTest {
 //
 //      // given
 //      given(itemService.createRecommend(fileRequest))
-//          .willReturn(RecommendResponse.of(recommends, "등록 완료"));
+//          .willReturn(RecommendResponse.of(recommends, "상품 등록 완료"));
 //
-//      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "등록 완료").getMessage());
+//      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "상품 등록 완료").getMessage());
 //
 //      mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
 //          .content(objectMapper.writeValueAsBytes(fileRequest)))
 //          .andExpect(status().isOk())
 //          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-//          .andExpect(jsonPath("$.result.message").value("등록 완료"))
+//          .andExpect(jsonPath("$.result.message").value("상품 등록 완료"))
 //          .andDo(print());
 //
 //      verify(itemService).createRecommend(fileRequest);
@@ -172,7 +171,7 @@ class ItemControllerTest {
     void success_register_recommend() throws Exception {
       // given
       given(itemService.relateItems(any(), any()))
-          .willReturn(SingleRecommendResponse.of(mockRecommend, "등록 완료"));
+          .willReturn(SingleRecommendResponse.of(mockRecommend, "상품 등록 완료"));
 
       mockMvc.perform(post(extraRecommendUrl).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsBytes(any()))
@@ -180,7 +179,7 @@ class ItemControllerTest {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
           .andExpect(jsonPath("$.result.target_item_id").value(itemId))
-          .andExpect(jsonPath("$.result.message").value("등록 완료"))
+          .andExpect(jsonPath("$.result.message").value("상품 등록 완료"))
           .andDo(print());
 
       verify(itemService).relateItems(any(), any());
@@ -264,7 +263,7 @@ class ItemControllerTest {
     @DisplayName("성공")
     void success_modify_item() throws Exception {
       given(itemService.editProduct(any(), any())).willReturn(
-          ProductEditResponse.of(mockItem, "수정 완료"));
+          ProductEditResponse.of(mockItem, "상품 수정 완료"));
 
       mockMvc.perform(put(editionUrl)
               .param("itemId", String.valueOf(itemId))
@@ -272,7 +271,7 @@ class ItemControllerTest {
               .content(objectMapper.writeValueAsBytes(productEditRequest)))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-          .andExpect(jsonPath("$.result.message").value("수정 완료"))
+          .andExpect(jsonPath("$.result.message").value("상품 수정 완료"))
           .andExpect(jsonPath("$.result.edited_item_id").value(mockItem.getItemId()))
           .andDo(print());
 

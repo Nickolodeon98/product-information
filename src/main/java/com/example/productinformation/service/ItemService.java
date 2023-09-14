@@ -43,7 +43,7 @@ public class ItemService {
     List<Product> products = productRepository.saveAll(
         productReadLineContext.readLines(fileRequest.getFilename()));
 
-    return ProductResponse.of(products, "등록 완료");
+    return ProductResponse.of(products, "상품 등록 완료");
   }
 
   public RecommendResponse createRecommend(FileRequest fileRequest) throws IOException {
@@ -51,7 +51,7 @@ public class ItemService {
     List<Recommend> recommends = recommendRepository.saveAll(
         recommendReadLineContext.readLines(fileRequest.getFilename()));
 
-    return RecommendResponse.of(recommends, "등록 완료");
+    return RecommendResponse.of(recommends, "상품 등록 완료");
   }
 
   /**
@@ -175,7 +175,7 @@ public class ItemService {
     }
 
     recommendEntity = recommendRepository.save(recommendRequest.toEntity(product));
-    return SingleRecommendResponse.of(recommendEntity, "등록 완료");
+    return SingleRecommendResponse.of(recommendEntity, "상품 등록 완료");
   }
 
   public ProductEditResponse editProduct(String itemId, ProductEditRequest request) {
@@ -192,7 +192,7 @@ public class ItemService {
 
     Product editedProduct = productRepository.save(request.toEntity(product.getId(), Long.valueOf(itemId)));
 
-    return ProductEditResponse.of(editedProduct, "수정 완료");
+    return ProductEditResponse.of(editedProduct, "상품 수정 완료");
   }
 
   public ProductDeleteResponse removeProduct(String itemId) {
