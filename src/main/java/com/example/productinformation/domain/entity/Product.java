@@ -22,7 +22,6 @@ import org.hibernate.annotations.Where;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode
 // Delete 시 실제로 삭제되지 않고 deleted_at 컬럼이 삭제 시도 시간으로 채워진다.
 @SQLDelete(sql = "UPDATE product SET deleted_at = current_timestamp WHERE id = ?")
 // 삭제된 적이 없는 엔티티만 조회된다.
