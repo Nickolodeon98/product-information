@@ -13,6 +13,7 @@ import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.request.ProductEditRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
+import com.example.productinformation.domain.dto.response.ProductDeleteResponse;
 import com.example.productinformation.domain.dto.response.ProductEditResponse;
 import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.domain.entity.Product;
@@ -63,6 +64,7 @@ class ItemControllerTest {
   final String extraRecommendUrl = "/rec/items/chain";
 
   final String editionUrl = "/rec/items/update";
+  final String deletionUrl = "/rec/items/removal";
 
   @BeforeEach
   void setUp() {
@@ -86,7 +88,8 @@ class ItemControllerTest {
 
     productEditRequest = ProductEditRequest.builder()
         .itemName("닥터마틴 블랙 스무스")
-        .itemImage("//static.shoeprize.com/Raffle/thumb/11838002-shoeprize-Dr.-Martens-1461-Smooth-Leather-Oxford-Black-Smooth-NEW-1690913038337.jpg?f=webp&w=1000")
+        .itemImage(
+            "//static.shoeprize.com/Raffle/thumb/11838002-shoeprize-Dr.-Martens-1461-Smooth-Leather-Oxford-Black-Smooth-NEW-1690913038337.jpg?f=webp&w=1000")
         .itemUrl("https://www.shoeprize.com/raffles/119061/")
         .originalPrice(210000)
         .salePrice(170000)
@@ -104,15 +107,15 @@ class ItemControllerTest {
 //
 //      // given
 //      given(itemService.createRecommend(fileRequest))
-//          .willReturn(RecommendResponse.of(recommends, "등록 완료"));
+//          .willReturn(RecommendResponse.of(recommends, "상품 등록 완료"));
 //
-//      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "등록 완료").getMessage());
+//      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "상품 등록 완료").getMessage());
 //
 //      mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
 //          .content(objectMapper.writeValueAsBytes(fileRequest)))
 //          .andExpect(status().isOk())
 //          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-//          .andExpect(jsonPath("$.result.message").value("등록 완료"))
+//          .andExpect(jsonPath("$.result.message").value("상품 등록 완료"))
 //          .andDo(print());
 //
 //      verify(itemService).createRecommend(fileRequest);
@@ -168,7 +171,7 @@ class ItemControllerTest {
     void success_register_recommend() throws Exception {
       // given
       given(itemService.relateItems(any(), any()))
-          .willReturn(SingleRecommendResponse.of(mockRecommend, "등록 완료"));
+          .willReturn(SingleRecommendResponse.of(mockRecommend, "상품 등록 완료"));
 
       mockMvc.perform(post(extraRecommendUrl).contentType(MediaType.APPLICATION_JSON)
               .content(objectMapper.writeValueAsBytes(any()))
@@ -176,7 +179,7 @@ class ItemControllerTest {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
           .andExpect(jsonPath("$.result.target_item_id").value(itemId))
-          .andExpect(jsonPath("$.result.message").value("등록 완료"))
+          .andExpect(jsonPath("$.result.message").value("상품 등록 완료"))
           .andDo(print());
 
       verify(itemService).relateItems(any(), any());
@@ -259,7 +262,8 @@ class ItemControllerTest {
     @Test
     @DisplayName("성공")
     void success_modify_item() throws Exception {
-      given(itemService.editProduct(any(), any())).willReturn(ProductEditResponse.of(mockItem, "수정 완료"));
+      given(itemService.editProduct(any(), any())).willReturn(
+          ProductEditResponse.of(mockItem, "상품 수정 완료"));
 
       mockMvc.perform(put(editionUrl)
               .param("itemId", String.valueOf(itemId))
@@ -267,7 +271,7 @@ class ItemControllerTest {
               .content(objectMapper.writeValueAsBytes(productEditRequest)))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-          .andExpect(jsonPath("$.result.message").value("수정 완료"))
+          .andExpect(jsonPath("$.result.message").value("상품 수정 완료"))
           .andExpect(jsonPath("$.result.edited_item_id").value(mockItem.getItemId()))
           .andDo(print());
 
@@ -277,7 +281,7 @@ class ItemControllerTest {
     @Test
     @DisplayName("실패 - 상품 없음")
     void fail_modify_item() throws Exception {
-      given(itemService.editProduct(any(),any()))
+      given(itemService.editProduct(any(), any()))
           .willThrow(new ItemException(ErrorCode.ITEM_NOT_FOUND,
               ErrorCode.ITEM_NOT_FOUND.getMessage()));
 
@@ -290,7 +294,46 @@ class ItemControllerTest {
           .andExpect(jsonPath("$.result.message").value(ErrorCode.ITEM_NOT_FOUND.getMessage()))
           .andDo(print());
 
-      verify(itemService).editProduct(any(),any());
+      verify(itemService).editProduct(any(), any());
+    }
+  }
+
+  @Nested
+  @DisplayName("상품 삭제")
+  class ItemRemoval {
+    @Test
+    @DisplayName("성공")
+    void success_delete_product() throws Exception {
+
+      given(itemService.removeProduct(any()))
+          .willReturn(ProductDeleteResponse.of(mockItem, "상품 삭제 완료"));
+
+      mockMvc.perform(delete(deletionUrl)
+              .param("itemId", String.valueOf(itemId)))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+          .andExpect(jsonPath("$.result.message").value("상품 삭제 완료"))
+          .andExpect(jsonPath("$.result.deleted_item_id").value(mockItem.getItemId()))
+          .andDo(print());
+
+      verify(itemService).removeProduct(any());
+    }
+
+    @Test
+    @DisplayName("실패 - 삭제하고자 하는 상품 없음")
+    void fail_delete_product() throws Exception {
+      given(itemService.removeProduct(any()))
+          .willThrow(new ItemException(ErrorCode.ITEM_NOT_FOUND,
+              ErrorCode.ITEM_NOT_FOUND.getMessage()));
+
+      mockMvc.perform(delete(deletionUrl)
+              .param("itemId", String.valueOf(itemId)))
+          .andExpect(status().isNotFound())
+          .andExpect(jsonPath("$.result.errorCode").value(ErrorCode.ITEM_NOT_FOUND.name()))
+          .andExpect(jsonPath("$.result.message").value(ErrorCode.ITEM_NOT_FOUND.getMessage()))
+          .andDo(print());
+
+      verify(itemService).removeProduct(any());
     }
   }
 

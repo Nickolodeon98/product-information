@@ -4,6 +4,7 @@ import com.example.productinformation.domain.dto.DetailedProductInfo;
 import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.request.ProductEditRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
+import com.example.productinformation.domain.dto.response.ProductDeleteResponse;
 import com.example.productinformation.domain.dto.response.ProductEditResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
@@ -42,7 +43,7 @@ public class ItemService {
     List<Product> products = productRepository.saveAll(
         productReadLineContext.readLines(fileRequest.getFilename()));
 
-    return ProductResponse.of(products, "등록 완료");
+    return ProductResponse.of(products, "상품 등록 완료");
   }
 
   public RecommendResponse createRecommend(FileRequest fileRequest) throws IOException {
@@ -50,7 +51,7 @@ public class ItemService {
     List<Recommend> recommends = recommendRepository.saveAll(
         recommendReadLineContext.readLines(fileRequest.getFilename()));
 
-    return RecommendResponse.of(recommends, "등록 완료");
+    return RecommendResponse.of(recommends, "상품 등록 완료");
   }
 
   /**
@@ -174,7 +175,7 @@ public class ItemService {
     }
 
     recommendEntity = recommendRepository.save(recommendRequest.toEntity(product));
-    return SingleRecommendResponse.of(recommendEntity, "등록 완료");
+    return SingleRecommendResponse.of(recommendEntity, "상품 등록 완료");
   }
 
   public ProductEditResponse editProduct(String itemId, ProductEditRequest request) {
@@ -191,6 +192,23 @@ public class ItemService {
 
     Product editedProduct = productRepository.save(request.toEntity(product.getId(), Long.valueOf(itemId)));
 
-    return ProductEditResponse.of(editedProduct, "수정 완료");
+    return ProductEditResponse.of(editedProduct, "상품 수정 완료");
+  }
+
+  public ProductDeleteResponse removeProduct(String itemId) {
+    itemId = itemId.trim();
+
+    if (itemId.length() == 0 || !itemId.matches("^[0-9]*$")) throw new ItemException(ErrorCode.INVALID_INPUT,
+        ErrorCode.INVALID_INPUT.getMessage());
+
+    Product deletedProduct = productRepository.findByItemId(Long.valueOf(itemId))
+        .orElseThrow(() -> {
+          throw new ItemException(ErrorCode.ITEM_NOT_FOUND,
+              ErrorCode.ITEM_NOT_FOUND.getMessage());
+        });
+
+    productRepository.deleteById(deletedProduct.getId());
+
+    return ProductDeleteResponse.of(deletedProduct, "상품 삭제 완료");
   }
 }

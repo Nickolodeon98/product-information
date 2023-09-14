@@ -35,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -331,7 +332,7 @@ class ItemServiceTest {
 
     @Test
     @DisplayName("실패 - 상품의 입력이 올바르게 주어지지 않음")
-    void fail_add_recommend_id_not_found() throws IOException {
+    void fail_edit_product_invalid_input() {
       ItemException e = Assertions.assertThrows(ItemException.class,
           () -> itemService.editProduct(" ", ProductEditRequest.of(editedProduct)));
 
@@ -340,7 +341,7 @@ class ItemServiceTest {
 
     @Test
     @DisplayName("실패 - 존재하지 않는 대상 상품")
-    void fail_edit_product() {
+    void fail_edit_product_not_found() {
       when(productRepository.findByItemId(any())).thenReturn(Optional.empty());
 
       ItemException e = Assertions.assertThrows(ItemException.class,
@@ -349,6 +350,32 @@ class ItemServiceTest {
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
 
       verify(productRepository).findByItemId(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("상품 삭제")
+  class ItemDeletion {
+    @Test
+    @DisplayName("실패 - 삭제할 상품 없음")
+    void fail_remove_product_not_found() {
+      when(productRepository.findByItemId(itemId)).thenReturn(Optional.empty());
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.removeProduct(String.valueOf(itemId)));
+
+      Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+
+      verify(productRepository).findByItemId(itemId);
+    }
+
+    @Test
+    @DisplayName("실패 - 올바르지 않은 입력")
+    void fail_remove_product_invalid_input() {
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.removeProduct(" "));
+
+      Assertions.assertEquals(ErrorCode.INVALID_INPUT, e.getErrorCode());
     }
   }
 }
