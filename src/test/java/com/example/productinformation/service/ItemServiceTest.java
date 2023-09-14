@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.swing.text.html.Option;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -66,11 +67,12 @@ class ItemServiceTest {
   List<Recommend> recommends;
   FileRequest fileRequest;
   Long itemId;
+  Long itemId2;
   Product wrongProduct;
   Recommend wrongRecommend;
   DetailedProductInfo recommendRequest;
-  private DetailedProductInfo wrongRecommendRequest;
-
+  DetailedProductInfo wrongRecommendRequest;
+  Product editedProduct;
   @BeforeEach
   void setUp() {
     sampleLine1 = "\"300002285\",\"아비루즈 ha-15\",\"//image.wconcept.co.kr/productimg/image/img2/85/300002285.jpg\",\"m.wconcept.co.kr/product/300002285\",\"5900\",\"5900\"";
@@ -78,6 +80,7 @@ class ItemServiceTest {
     sampleLine3 = "\"300003606\",\"CANVAS TOTE BAG-BROWN\",\"//image.wconcept.co.kr/productimg/image/img2/06/300003606.jpg\",\"m.wconcept.co.kr/product/300003606\",\"98000\",\"98000\"";
 
     itemId = 300002285L;
+    itemId2 = 300003606L;
     mockProduct = ProductFixture.get(itemId);
 
     mockRecommend = RecommendFixture.get(itemId);
@@ -93,6 +96,8 @@ class ItemServiceTest {
     wrongRecommend = RecommendFixture.getWrong(itemId);
     recommendRequest = DetailedProductInfo.of(mockProduct, mockRecommend);
     wrongRecommendRequest = DetailedProductInfo.of(wrongProduct, wrongRecommend);
+
+    editedProduct = ProductFixture.get(itemId2);
   }
 
   //  @Nested
@@ -292,6 +297,47 @@ class ItemServiceTest {
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
 
       verify(productRepository).findAllByItemIdIn(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("상품 수정")
+  class ItemEdition {
+
+    @Test
+    @DisplayName("성공")
+    void success_edit_product() {
+      when(productRepository.findByItemId(any())).thenReturn(Optional.of(mockProduct));
+      when(productRepository.save(any())).thenReturn(editedProduct);
+
+      ProductEditResponse response = itemService.editProduct(itemId, ProductInfo.of(editedProduct));
+
+      Assertions.assertEquals(editedProduct.getItemId(), response.getItemId());
+
+      verify(productRepository).findByItemId(any());
+      verify(productRepository).save(any());
+    }
+
+    @Test
+    @DisplayName("실패 - 상품의 고유 아이디가 주어지지 않음")
+    void fail_add_recommend_id_not_found() throws IOException {
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.editProduct(null, ProductInfo.of(editedProduct)));
+
+      Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("실패 - 존재하지 않는 대상 상품")
+    void fail_edit_product() {
+      when(productRepository.findByItemId(any())).thenReturn(Optional.empty());
+
+      ItemException e = Assertions.assertThrows(ItemException.class,
+          () -> itemService.editProduct(itemId, ProductInfo.of(editedProduct)));
+
+      Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+
+      verify(productRepository).findByItemId(any());
     }
   }
 }
