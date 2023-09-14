@@ -1,11 +1,14 @@
 ## 상품 및 연관 상품 CRUD API (성명: 전승환)
 <hr>
 
-
-
 ### 프로젝트 소개
 <hr>
 product.csv, rec.csv 두 파일을 활용해 상품 정보를 생성, 조회, 수정, 삭제할 수 있는 API 구현 프로젝트
+
+### ERD
+<hr>
+
+![erd.png](images/erd.png)
 
 ### 개발 환경
 
@@ -39,8 +42,3 @@ SPRING_DATASOURCE_PASSWORD=Ingod2013!;SPRING_DATASOURCE_URL=jdbc:mysql://ec2-13-
 
 6. 아래와 같은 화면을 볼 수 있습니다. 
 ![img_6.png](images/img_6.png)
-
-### ERD
-<hr>
-
-![erd.png](images/erd.png)
