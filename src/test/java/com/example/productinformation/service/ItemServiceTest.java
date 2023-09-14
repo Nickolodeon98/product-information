@@ -226,6 +226,8 @@ class ItemServiceTest {
           () -> itemService.relateItems(recommendRequest, itemId));
 
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
+
+      verify(productRepository).findByItemId(itemId);
     }
 
 
