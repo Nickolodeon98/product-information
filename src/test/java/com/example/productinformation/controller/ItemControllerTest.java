@@ -15,6 +15,7 @@ import com.example.productinformation.domain.dto.request.ProductEditRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.ProductDeleteResponse;
 import com.example.productinformation.domain.dto.response.ProductEditResponse;
+import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
@@ -96,31 +97,31 @@ class ItemControllerTest {
         .build();
   }
 
-//  @Nested
-//  @DisplayName("연관 상품 등록")
-//  class RecommendRegistration {
-//
-//    @Test
-//    @DisplayName("성공")
-//    void recommend_success() throws Exception {
-//      log.info("recommendsId:{}", recommends.get(0).getId());
-//
-//      // given
-//      given(itemService.createRecommend(fileRequest))
-//          .willReturn(RecommendResponse.of(recommends, "상품 등록 완료"));
-//
-//      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "상품 등록 완료").getMessage());
-//
-//      mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
-//          .content(objectMapper.writeValueAsBytes(fileRequest)))
-//          .andExpect(status().isOk())
-//          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-//          .andExpect(jsonPath("$.result.message").value("상품 등록 완료"))
-//          .andDo(print());
-//
-//      verify(itemService).createRecommend(fileRequest);
-//    }
-//  }
+  @Nested
+  @DisplayName("파일 DB 에 등록")
+  class FileRegistration {
+
+    @Test
+    @DisplayName("성공")
+    void recommend_success() throws Exception {
+      log.info("recommendsId:{}", recommends.get(0).getId());
+
+      // given
+      given(itemService.createRecommend(any()))
+          .willReturn(RecommendResponse.of(recommends, "파일 등록 완료"));
+
+      log.info("recommendResponse:{}", RecommendResponse.of(recommends, "파일 등록 완료").getMessage());
+
+      mockMvc.perform(post(url).contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsBytes(fileRequest)))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+          .andExpect(jsonPath("$.result.message").value("파일 등록 완료"))
+          .andDo(print());
+
+      verify(itemService).createRecommend(any());
+    }
+  }
 
   @Nested
   @DisplayName("상품 등록")

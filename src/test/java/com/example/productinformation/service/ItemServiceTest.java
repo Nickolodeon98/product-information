@@ -11,6 +11,7 @@ import com.example.productinformation.domain.dto.DetailedProductInfo;
 import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.request.ProductEditRequest;
 import com.example.productinformation.domain.dto.response.ProductEditResponse;
+import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.domain.entity.Product;
@@ -112,22 +113,36 @@ class ItemServiceTest {
         .build();
   }
 
-  //  @Nested
-//  @DisplayName("상품 등록")
-//  class ProductCreation {
-//    @Test
-//    @DisplayName("성공")
-//    void success_create_product() throws IOException {
-//      when(productReadLineContext.readLines("filename")).thenReturn(products);
-//      when(productRepository.saveAll(any())).thenReturn(products);
-//
-//      ProductResponse response = itemService.createProduct(fileRequest);
-//
-//      Assertions.assertEquals(products.get(0).getId(), response.getProductIds().get(0));
-//
-//      verify(productRepository).saveAll(any());
-//    }
-//  }
+  @Nested
+  @DisplayName("DB 구축")
+  class DBCreation {
+    @Test
+    @DisplayName("성공 - 상품")
+    void success_create_product() throws IOException {
+      when(productReadLineContext.readLines("filename")).thenReturn(products);
+      when(productRepository.saveAll(any())).thenReturn(products);
+
+      ProductResponse response = itemService.createProduct(fileRequest);
+
+      Assertions.assertEquals(products.get(0).getId(), response.getProductIds().get(0));
+
+      verify(productRepository).saveAll(any());
+    }
+
+    @Test
+    @DisplayName("성공 - 연관 상품")
+    void success_add_product() throws IOException {
+      when(recommendReadLineContext.readLines("filename")).thenReturn(recommends);
+      when(recommendRepository.saveAll(any())).thenReturn(recommends);
+
+      RecommendResponse response = itemService.createRecommend(fileRequest);
+
+      Assertions.assertEquals(recommends.get(0).getId(), response.getRecommendIds().get(0));
+
+      verify(recommendRepository).saveAll(any());
+    }
+  }
+
   @Nested
   @DisplayName("상품 등록")
   class ProductCreation {
@@ -168,24 +183,6 @@ class ItemServiceTest {
       verify(productRepository).findByItemId(itemId);
     }
   }
-
-//  @Nested
-//  @DisplayName("연관 상품 등록")
-//  class ProductRegistration {
-//
-//    @Test
-//    @DisplayName("성공")
-//    void success_add_product() throws IOException {
-//      when(recommendReadLineContext.readLines("filename")).thenReturn(recommends);
-//      when(recommendRepository.saveAll(any())).thenReturn(recommends);
-//
-//      RecommendResponse response = itemService.createRecommend(fileRequest);
-//
-//      Assertions.assertEquals(recommends.get(0).getId(), response.getRecommendIds().get(0));
-//
-//      verify(recommendRepository).saveAll(any());
-//    }
-//  }
 
   @Nested
   @DisplayName("연관 상품 등록")
