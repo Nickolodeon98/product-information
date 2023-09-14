@@ -7,6 +7,7 @@ import com.example.productinformation.domain.dto.response.ItemResponse;
 import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.Response;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
+import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.service.ItemService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -78,10 +79,10 @@ public class ItemController {
   @ResponseBody
   @Operation(summary = "[사용자] 연관 상품 등록", description = "입력된 연관 상품 정보를 토대로 DB 에 연관 상품을 저장할 수 있다.")
   @PostMapping("/items/chain")
-  public Response<SingeRecommendResponse> registerRecommend(
+  public Response<SingleRecommendResponse> registerRecommend(
       @RequestBody(required = false) DetailedProductInfo recommendRequest, Long targetItemId) {
 
-    ProductInfo response = itemService.relateItems(recommendRequest, targetItemId);
+    SingleRecommendResponse response = itemService.relateItems(recommendRequest, targetItemId);
 
     return Response.success(response);
   }

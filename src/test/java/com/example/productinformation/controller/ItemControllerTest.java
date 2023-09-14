@@ -12,6 +12,7 @@ import com.example.productinformation.domain.dto.DetailedProductInfo;
 import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
+import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
 import com.example.productinformation.exception.ErrorCode;
@@ -158,7 +159,7 @@ class ItemControllerTest {
               .content(objectMapper.writeValueAsBytes(any())))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
-          .andExpect(jsonPath("$.result.itemId").value(itemId))
+          .andExpect(jsonPath("$.result.target_item_id").value(itemId))
           .andExpect(jsonPath("$.result.message").value("등록 완료"))
           .andDo(print());
 
