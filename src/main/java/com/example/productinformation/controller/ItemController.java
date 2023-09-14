@@ -3,7 +3,9 @@ package com.example.productinformation.controller;
 import com.example.productinformation.domain.dto.DetailedProductInfo;
 import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
+import com.example.productinformation.domain.dto.request.ProductEditRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
+import com.example.productinformation.domain.dto.response.ProductEditResponse;
 import com.example.productinformation.domain.dto.response.ProductResponse;
 import com.example.productinformation.domain.Response;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -87,6 +90,12 @@ public class ItemController {
     return Response.success(response);
   }
 
-  @Response
+  @ResponseBody
+  @PutMapping("/items/update")
+  public Response<ProductEditResponse> modifyRecommend(@RequestParam("itemId") String itemId, ProductEditRequest productEditRequest) {
+    ProductEditResponse response = itemService.editProduct(Long.valueOf(itemId), productEditRequest);
+
+    return Response.success(response);
+  }
 
 }

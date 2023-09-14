@@ -11,7 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.example.productinformation.domain.dto.DetailedProductInfo;
 import com.example.productinformation.domain.dto.ProductInfo;
 import com.example.productinformation.domain.dto.request.FileRequest;
+import com.example.productinformation.domain.dto.request.ProductEditRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
+import com.example.productinformation.domain.dto.response.ProductEditResponse;
 import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.domain.entity.Product;
 import com.example.productinformation.domain.entity.Recommend;
@@ -20,6 +22,7 @@ import com.example.productinformation.exception.ItemException;
 import com.example.productinformation.fixture.ProductFixture;
 import com.example.productinformation.fixture.RecommendFixture;
 import com.example.productinformation.service.ItemService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +49,7 @@ class ItemControllerTest {
   ObjectMapper objectMapper;
   FileRequest fileRequest;
   ProductInfo productRequest;
+  ProductEditRequest productEditRequest;
   Product mockItem;
   List<Product> products;
   List<Recommend> recommends;
@@ -79,6 +83,14 @@ class ItemControllerTest {
 
     detailedProductInfos = new ArrayList<>();
     detailedProductInfos.add(DetailedProductInfo.of(mockItem, mockRecommend));
+
+    productEditRequest = ProductEditRequest.builder()
+        .itemName("닥터마틴 블랙 스무스")
+        .itemImage("//static.shoeprize.com/Raffle/thumb/11838002-shoeprize-Dr.-Martens-1461-Smooth-Leather-Oxford-Black-Smooth-NEW-1690913038337.jpg?f=webp&w=1000")
+        .itemUrl("https://www.shoeprize.com/raffles/119061/")
+        .originalPrice(210000)
+        .salePrice(170000)
+        .build();
   }
 
 //  @Nested
@@ -246,37 +258,39 @@ class ItemControllerTest {
 
     @Test
     @DisplayName("성공")
-    void success_modify_item() {
-      given(itemService.editProduct(any())).willReturn(ProductEditResponse.of(mockItem, "수정 완료"));
+    void success_modify_item() throws Exception {
+      given(itemService.editProduct(any(), any())).willReturn(ProductEditResponse.of(mockItem, "수정 완료"));
 
       mockMvc.perform(put(editionUrl)
               .param("itemId", String.valueOf(itemId))
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsBytes(productRequest)))
+              .content(objectMapper.writeValueAsBytes(productEditRequest)))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
           .andExpect(jsonPath("$.result.message").value("수정 완료"))
-          .andExpect(jsonPath("$.result.itemId").value(productRequest.getItemId()))
+          .andExpect(jsonPath("$.result.edited_item_id").value(mockItem.getItemId()))
           .andDo(print());
 
-      verify(itemService).editProduct(any());
+      verify(itemService).editProduct(any(), any());
     }
 
     @Test
     @DisplayName("실패 - 상품 없음")
-    void fail_modify_item() {
-      given(itemService.editProduct(any()))
+    void fail_modify_item() throws Exception {
+      given(itemService.editProduct(any(),any()))
           .willThrow(new ItemException(ErrorCode.ITEM_NOT_FOUND,
               ErrorCode.ITEM_NOT_FOUND.getMessage()));
 
       mockMvc.perform(put(editionUrl)
               .param("itemId", String.valueOf(itemId))
               .contentType(MediaType.APPLICATION_JSON)
-              .content(objectMapper.writeValueAsBytes(productRequest)))
+              .content(objectMapper.writeValueAsBytes(productEditRequest)))
           .andExpect(status().isNotFound())
           .andExpect(jsonPath("$.result.errorCode").value(ErrorCode.ITEM_NOT_FOUND.name()))
           .andExpect(jsonPath("$.result.message").value(ErrorCode.ITEM_NOT_FOUND.getMessage()))
           .andDo(print());
+
+      verify(itemService).editProduct(any(),any());
     }
   }
 

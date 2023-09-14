@@ -2,7 +2,9 @@ package com.example.productinformation.service;
 
 import com.example.productinformation.domain.dto.DetailedProductInfo;
 import com.example.productinformation.domain.dto.ProductInfo;
+import com.example.productinformation.domain.dto.request.ProductEditRequest;
 import com.example.productinformation.domain.dto.response.ItemResponse;
+import com.example.productinformation.domain.dto.response.ProductEditResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.domain.entity.Product;
@@ -144,10 +146,11 @@ public class ItemService {
     return ProductInfo.of(savedProduct);
   }
 
-  public SingleRecommendResponse relateItems(DetailedProductInfo recommendRequest, Long targetItemId) {
+  public SingleRecommendResponse relateItems(DetailedProductInfo recommendRequest,
+      Long targetItemId) {
 
     Optional<Recommend> recommend = recommendRepository.findByItemId(recommendRequest.getItemId());
-    
+
     // 이미 연관 상품을 등록한 적이 있다면 예외 처리
     if (recommend.isPresent()) {
       throw new ItemException(ErrorCode.DUPLICATE_ITEM,
@@ -155,13 +158,14 @@ public class ItemService {
     }
     // 연관을 설정할 대상 상품을 찾는다. 대상 상품이 없는데 연관 관계를 설정하려고 하면 예외 처리
     Product product = productRepository.findByItemId(targetItemId)
-        .orElseThrow(()->{
+        .orElseThrow(() -> {
           throw new ItemException(ErrorCode.ITEM_NOT_FOUND,
               ErrorCode.ITEM_NOT_FOUND.getMessage());
         });
 
     // 현재 연관 상품으로 등록되는 상품이 이미 존재하는지 확인한다.
-    Optional<Product> recommendedItem = productRepository.findByItemId(recommendRequest.getItemId());
+    Optional<Product> recommendedItem = productRepository.findByItemId(
+        recommendRequest.getItemId());
     Recommend recommendEntity = null;
 
     // 존재하지 않는다면 product 테이블에도 저장한다.
@@ -171,5 +175,18 @@ public class ItemService {
 
     recommendEntity = recommendRepository.save(recommendRequest.toEntity(product));
     return SingleRecommendResponse.of(recommendEntity, "등록 완료");
+  }
+
+  public ProductEditResponse editProduct(Long itemId, ProductEditRequest request) {
+
+    productRepository.findByItemId(itemId)
+        .orElseThrow(() -> {
+          throw new ItemException(ErrorCode.ITEM_NOT_FOUND,
+              ErrorCode.ITEM_NOT_FOUND.getMessage());
+        });
+
+    Product editedProduct = productRepository.save(request.toEntity(itemId));
+
+    return ProductEditResponse.of(editedProduct, "수정 완료");
   }
 }

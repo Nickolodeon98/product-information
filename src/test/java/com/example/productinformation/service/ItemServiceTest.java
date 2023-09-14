@@ -9,6 +9,8 @@ import static org.mockito.Mockito.when;
 
 import com.example.productinformation.domain.dto.DetailedProductInfo;
 import com.example.productinformation.domain.dto.ProductInfo;
+import com.example.productinformation.domain.dto.request.ProductEditRequest;
+import com.example.productinformation.domain.dto.response.ProductEditResponse;
 import com.example.productinformation.domain.dto.response.RecommendResponse;
 import com.example.productinformation.domain.dto.response.SingleRecommendResponse;
 import com.example.productinformation.domain.entity.Product;
@@ -73,6 +75,7 @@ class ItemServiceTest {
   DetailedProductInfo recommendRequest;
   DetailedProductInfo wrongRecommendRequest;
   Product editedProduct;
+  ProductEditRequest productEditRequest;
   @BeforeEach
   void setUp() {
     sampleLine1 = "\"300002285\",\"아비루즈 ha-15\",\"//image.wconcept.co.kr/productimg/image/img2/85/300002285.jpg\",\"m.wconcept.co.kr/product/300002285\",\"5900\",\"5900\"";
@@ -98,6 +101,14 @@ class ItemServiceTest {
     wrongRecommendRequest = DetailedProductInfo.of(wrongProduct, wrongRecommend);
 
     editedProduct = ProductFixture.get(itemId2);
+
+    productEditRequest = ProductEditRequest.builder()
+        .itemName("닥터마틴 블랙 스무스")
+        .itemImage("//static.shoeprize.com/Raffle/thumb/11838002-shoeprize-Dr.-Martens-1461-Smooth-Leather-Oxford-Black-Smooth-NEW-1690913038337.jpg?f=webp&w=1000")
+        .itemUrl("https://www.shoeprize.com/raffles/119061/")
+        .originalPrice(210000)
+        .salePrice(170000)
+        .build();
   }
 
   //  @Nested
@@ -310,9 +321,9 @@ class ItemServiceTest {
       when(productRepository.findByItemId(any())).thenReturn(Optional.of(mockProduct));
       when(productRepository.save(any())).thenReturn(editedProduct);
 
-      ProductEditResponse response = itemService.editProduct(itemId, ProductInfo.of(editedProduct));
+      ProductEditResponse response = itemService.editProduct(itemId, productEditRequest);
 
-      Assertions.assertEquals(editedProduct.getItemId(), response.getItemId());
+      Assertions.assertEquals(editedProduct.getItemId(), response.getEditedItemId());
 
       verify(productRepository).findByItemId(any());
       verify(productRepository).save(any());
@@ -322,7 +333,7 @@ class ItemServiceTest {
     @DisplayName("실패 - 상품의 고유 아이디가 주어지지 않음")
     void fail_add_recommend_id_not_found() throws IOException {
       ItemException e = Assertions.assertThrows(ItemException.class,
-          () -> itemService.editProduct(null, ProductInfo.of(editedProduct)));
+          () -> itemService.editProduct(null, ProductEditRequest.of(editedProduct)));
 
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
     }
@@ -333,7 +344,7 @@ class ItemServiceTest {
       when(productRepository.findByItemId(any())).thenReturn(Optional.empty());
 
       ItemException e = Assertions.assertThrows(ItemException.class,
-          () -> itemService.editProduct(itemId, ProductInfo.of(editedProduct)));
+          () -> itemService.editProduct(itemId, ProductEditRequest.of(editedProduct)));
 
       Assertions.assertEquals(ErrorCode.ITEM_NOT_FOUND, e.getErrorCode());
 
