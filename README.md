@@ -6,8 +6,7 @@ _product.csv, rec.csv 두 파일을 활용해 상품 정보를 생성, 조회, �
 
 ### ERD
 
-
-![erd.png](images/erd.png)
+![img.png](images/erd.png)
 
 ### 개발 환경
 
