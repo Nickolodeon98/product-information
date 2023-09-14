@@ -13,6 +13,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Setter
@@ -21,7 +23,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class Product implements Serializable {
+// Delete 시 실제로 삭제되지 않고 deleted_at 컬럼이 삭제 시도 시간으로 채워진다.
+@SQLDelete(sql = "UPDATE product SET deleted_at = current_timestamp WHERE id = ?")
+// 삭제된 적이 없는 엔티티만 조회된다.
+@Where(clause = "deleted_at IS NULL")
+public class Product extends BaseEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
