@@ -37,3 +37,7 @@ SPRING_DATASOURCE_PASSWORD=Ingod2013!;SPRING_DATASOURCE_URL=jdbc:mysql://ec2-13-
 
 6. 아래와 같은 화면을 볼 수 있습니다. 
 ![img_6.png](images/img_6.png)
+
+### ERD
+<hr>
+![img.png](img.png)
