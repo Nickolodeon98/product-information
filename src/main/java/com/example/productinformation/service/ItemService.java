@@ -180,7 +180,7 @@ public class ItemService {
   public ProductEditResponse editProduct(String itemId, ProductEditRequest request) {
     itemId = itemId.trim();
 
-    if (itemId.length() == 0 || itemId.contains("[^0-9]")) throw new ItemException(ErrorCode.INVALID_INPUT,
+    if (itemId.length() == 0 || itemId.matches("[^0-9]")) throw new ItemException(ErrorCode.INVALID_INPUT,
         ErrorCode.INVALID_INPUT.getMessage());
 
     Product product = productRepository.findByItemId(Long.valueOf(itemId))
